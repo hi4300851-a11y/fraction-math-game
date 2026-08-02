@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!!</title>
+  <meta name="description" content="진천상산초등학교 4학년 1반 분수 용사들을 위한 6단계 순차 미션 & 보스전 학습 앱!" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gamja+Flower&display=swap" rel="stylesheet">
+  <!-- Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+  <style>
+    /* =========================================================
+       Design System & Layout Styles
+       ========================================================= */
+    :root {
+      --primary-color: #4f46e5;
+      --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+      --card-bg: rgba(255, 255, 255, 0.12);
+      --card-border: rgba(255, 255, 255, 0.22);
+      --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --text-main: #ffffff;
+      --gold-glow: 0 0 15px rgba(251, 191, 36, 0.6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      font-family: 'Jua', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+    #app {
+      width: 100%;
+      max-width: 900px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      padding: 0.8rem 1.5rem;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+    }
+    .user-profile { display: flex; align-items: center; gap: 0.75rem; }
+    .avatar-badge {
+      font-size: 2.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; border: 2px solid #ffd700;
+    }
+    .user-name { font-size: 1.2rem; font-weight: bold; }
+    .user-stats { font-size: 0.9rem; color: #cbd5e1; }
+    .user-gold-box {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      padding: 0.5rem 1.2rem; border-radius: 30px;
+      font-size: 1.3rem; font-weight: bold;
+      box-shadow: var(--gold-glow);
+    }
+    .auth-btns { display: flex; gap: 0.5rem; }
+    .btn-sm {
+      font-family: 'Jua', sans-serif;
+      padding: 0.4rem 0.8rem; font-size: 0.95rem;
+      border: none; border-radius: 12px; cursor: pointer;
+    }
+    .btn-google { background: #ea4335; color: white; }
+    .btn-guest { background: rgba(255, 255, 255, 0.2); color: white; }
+    .view-screen { display: none; flex-direction: column; align-items: center; width: 100%; }
+    .view-screen.active { display: flex; }
+    .game-title { text-align: center; margin-bottom: 1.5rem; }
+    .game-title h1 {
+      font-size: 2.2rem;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(to right, #fde047, #f97316);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .start-mission-banner {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.8), rgba(99, 102, 241, 0.9));
+      border: 3px solid #fde047; border-radius: 20px;
+      padding: 1.2rem 1.8rem; display: flex; align-items: center; gap: 1.2rem;
+      cursor: pointer; margin-bottom: 1.2rem;
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+    }
+    .action-banner { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; margin-bottom: 1.5rem; }
+    .banner-card {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      backdrop-filter: blur(10px); border-radius: 20px; padding: 1.2rem;
+      display: flex; align-items: center; gap: 1rem; cursor: pointer;
+    }
+    .banner-card.boss-card { background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.5)); border-color: #f87171; }
+    .banner-card.hall-card { background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(180, 83, 9, 0.5)); border-color: #fbbf24; }
+    .banner-icon { font-size: 2.8rem; }
+    .minigame-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; width: 100%; }
+    .game-card {
+      background: var(--card-bg); backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: 18px;
+      padding: 1.2rem; display: flex; flex-direction: column; align-items: center;
+      text-align: center; cursor: pointer; position: relative;
+    }
+    .stage-badge { position: absolute; top: 10px; left: 10px; background: #f59e0b; color: black; font-weight: bold; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
+    .mission-step-indicator {
+      width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--card-border);
+      padding: 0.6rem 1rem; border-radius: 15px; margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #fde047;
+    }
+    .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 1rem; }
+    .btn-back { font-family: 'Jua', sans-serif; background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 14px; cursor: pointer; }
+    .timer-box { background: rgba(239, 68, 68, 0.3); border: 2px solid #f87171; padding: 0.5rem 1.5rem; border-radius: 30px; font-size: 1.5rem; font-weight: bold; }
+    .question-card {
+      background: rgba(0, 0, 0, 0.35); border: 2px solid var(--card-border);
+      backdrop-filter: blur(15px); width: 100%; border-radius: 24px;
+      padding: 2rem; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; margin-bottom: 1.5rem; min-height: 200px;
+    }
+    .math-expr { display: flex; align-items: center; gap: 1.2rem; font-size: 2.5rem; }
+    .fraction-box { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; padding: 0 0.4rem; }
+    .fraction-box .num { border-bottom: 3px solid #ffffff; padding: 0 0.3rem 0.2rem 0.3rem; line-height: 1; }
+    .fraction-box .den { padding: 0.2rem 0.3rem 0 0.3rem; line-height: 1; }
+    .mixed-fraction { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .whole-num, .whole-only { font-size: 2.8rem; font-weight: bold; color: #ffffff !important; }
+    .question-card .whole-num, .question-card .whole-only { color: #fbbf24 !important; }
+    .operator { font-size: 2.5rem; color: #38bdf8; font-weight: bold; }
+    .visual-hint-container { width: 100%; margin-top: 1.5rem; background: rgba(255, 255, 255, 0.08); padding: 0.8rem; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .hint-label { font-size: 0.9rem; color: #94a3b8; }
+    .fraction-bars-wrap { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 400px; }
+    .fraction-bar { display: flex; width: 100%; height: 24px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.3); }
+    .bar-segment { flex: 1; border-right: 1px solid rgba(0, 0, 0, 0.3); background: rgba(255, 255, 255, 0.15); }
+    .bar-segment.filled-1 { background: #38bdf8; }
+    .bar-segment.filled-2 { background: #f43f5e; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; }
+    .option-btn {
+      font-family: 'Jua', sans-serif; background: var(--card-bg);
+      backdrop-filter: blur(10px); border: 2px solid var(--card-border);
+      border-radius: 18px; padding: 1.2rem; font-size: 1.8rem;
+      color: #ffffff !important; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .option-btn * { color: #ffffff !important; border-color: #ffffff !important; }
+    .boss-card-container { width: 100%; background: linear-gradient(135deg, rgba(153, 27, 27, 0.6), rgba(69, 10, 10, 0.8)); border: 3px solid #ef4444; border-radius: 24px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; margin-bottom: 1.5rem; }
+    .boss-avatar { font-size: 4rem; }
+    .boss-hp-bar-bg { width: 100%; max-width: 500px; height: 25px; background: rgba(0, 0, 0, 0.5); border-radius: 15px; overflow: hidden; border: 2px solid #f87171; position: relative; margin-top: 0.8rem; }
+    .boss-hp-bar-fill { height: 100%; width: 100%; background: linear-gradient(to right, #f43f5e, #ef4444); transition: width 0.3s ease; }
+    .boss-hp-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.9rem; font-weight: bold; }
+    .hall-container { width: 100%; background: var(--card-bg); backdrop-filter: blur(12px); border: 2px solid var(--card-border); border-radius: 24px; padding: 1.5rem; }
+    .tab-nav { display: flex; gap: 1rem; margin-bottom: 1.2rem; }
+    .tab-btn { font-family: 'Jua', sans-serif; flex: 1; padding: 0.8rem; border: none; border-radius: 14px; font-size: 1.1rem; background: rgba(255, 255, 255, 0.1); color: white; cursor: pointer; }
+    .tab-btn.active { background: linear-gradient(135deg, #f59e0b, #d97706); font-weight: bold; }
+    .rank-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .rank-item { display: flex; align-items: center; justify-content: space-between; background: rgba(0, 0, 0, 0.25); padding: 0.8rem 1.2rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .rank-number { font-size: 1.4rem; width: 40px; font-weight: bold; }
+    .rank-number.top1 { color: #ffd700; }
+    .rank-number.top2 { color: #c0c0c0; }
+    .rank-number.top3 { color: #cd7f32; }
+    .rank-user { display: flex; align-items: center; gap: 0.8rem; flex: 1; }
+    .rank-score { font-size: 1.2rem; font-weight: bold; color: #fbbf24; }
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center;
+      z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: 24px; padding: 2rem; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); }
+    .modal-title { font-size: 2rem; margin-bottom: 1rem; color: #fbbf24; }
+    .btn-primary { font-family: 'Jua', sans-serif; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; border: none; padding: 0.8rem 2rem; font-size: 1.2rem; border-radius: 16px; cursor: pointer; margin-top: 1.2rem; }
+    .floating-text { position: fixed; font-family: 'Jua', sans-serif; font-size: 1.6rem; font-weight: bold; pointer-events: none; animation: floatUp 1s forwards ease-out; z-index: 9999; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(1.3); } }
+  </style>
+  <script type="module" crossorigin src="/assets/index-5iaLx4Rb.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <div class="user-profile">
+        <div class="avatar-badge" id="user-avatar">🧙‍♂️</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">상산초 용사</div>
+          <div class="user-stats" id="user-stats-display">클리어: 0회 | 보스: 0회</div>
+        </div>
+      </div>
+      <div class="user-gold-box">
+        <span class="gold-icon">🪙</span>
+        <span id="user-gold-display">50</span> G
+      </div>
+      <div class="auth-btns">
+        <button id="btn-google-login" class="btn-sm btn-google">Google 로그인</button>
+        <button id="btn-guest-login" class="btn-sm btn-guest">익명 로그인</button>
+      </div>
+    </header>
+
+    <main id="view-lobby" class="view-screen active">
+      <div class="game-title">
+        <h1>⚔️ 진천상산초 4학년 1반<br>분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
+        <p>미션 1부터 6까지 순서대로 클리어하고, 100 골드로 분수 보스를 퇴치하자!</p>
+      </div>
+      <div id="btn-start-sequential-mission" class="banner-card start-mission-banner">
+        <div class="banner-icon">🎯</div>
+        <div class="banner-text">
+          <h3 style="font-size: 1.6rem; color: #fde047;">🚀 6단계 미션 순서대로 도전하기!</h3>
+          <p>미션 1(진분수 덧셈) ➔ 미션 6(자연수-가분수 뺄셈)까지 연속 도전!</p>
+        </div>
+      </div>
+      <div class="action-banner">
+        <div id="card-boss-dungeon" class="banner-card boss-card">
+          <div class="banner-icon">👹</div>
+          <div class="banner-text">
+            <h3>보스 던전 도전!</h3>
+            <p>100 Gold 필요 (10문제 배틀)</p>
+          </div>
+        </div>
+        <div id="card-hall-of-fame" class="banner-card hall-card">
+          <div class="banner-icon">🏆</div>
+          <div class="banner-text">
+            <h3>명예의 전당</h3>
+            <p>골드 & 클리어 Top 10 랭킹</p>
+          </div>
+        </div>
+      </div>
+      <h2 style="margin-bottom: 1rem; width: 100%; text-align: left;">📜 미션 수행 순서 (1단계 ~ 6단계)</h2>
+      <div class="minigame-grid" id="minigame-grid-container"></div>
+    </main>
+
+    <main id="view-minigame" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 로비로 돌아가기</button>
+        <h2 id="minigame-title">미션 1: 진분수의 덧셈</h2>
+        <div class="timer-box">⏱️ <span id="game-timer">25</span>s</div>
+      </div>
+      <div class="mission-step-indicator" id="mission-step-indicator"></div>
+      <div class="question-card">
+        <div id="question-render-box"></div>
+        <div class="visual-hint-container">
+          <span class="hint-label">💡 분수 시각 가이드 (분모 쪼개기)</span>
+          <div class="fraction-bars-wrap" id="visual-bars-box"></div>
+        </div>
+      </div>
+      <div class="options-grid" id="options-grid-box"></div>
+    </main>
+
+    <main id="view-boss" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 도망치기</button>
+        <h2>👹 분수 드래곤 보스전!</h2>
+        <div class="timer-box">⏱️ <span id="boss-timer">60</span>s</div>
+      </div>
+      <div class="boss-card-container">
+        <div class="boss-avatar">🐲</div>
+        <h3>대마왕 분수 드래곤</h3>
+        <div class="boss-hp-bar-bg">
+          <div class="boss-hp-bar-fill" id="boss-hp-fill"></div>
+          <div class="boss-hp-text"><span id="boss-hp-current">100</span> / 100 HP</div>
+        </div>
+        <p style="margin-top: 0.5rem; font-size: 0.95rem;" id="boss-progress-text">문제 1 / 10</p>
+      </div>
+      <div class="question-card">
+        <div id="boss-question-render-box"></div>
+      </div>
+      <div class="options-grid" id="boss-options-grid-box"></div>
+    </main>
+
+    <main id="view-hall" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 로비로 돌아가기</button>
+        <h2>🏆 4학년 1반 명예의 전당 Top 10</h2>
+        <div></div>
+      </div>
+      <div class="hall-container">
+        <div class="tab-nav">
+          <button id="tab-gold-rank" class="tab-btn active">🪙 골드 부자 왕 Top 10</button>
+          <button id="tab-clears-rank" class="tab-btn">⚡ 미니게임 마스터 Top 10</button>
+        </div>
+        <div class="rank-list" id="rank-list-box"></div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="game-modal">
+      <div class="modal-card">
+        <div class="modal-title" id="modal-title-text">🎉 미니게임 완료!</div>
+        <p id="modal-body-text" style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 1rem;"></p>
+        <button class="btn-primary" id="modal-close-btn">확인</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
