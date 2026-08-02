@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!!</title>
+  <meta name="description" content="진천상산초등학교 4학년 1반 분수 용사들을 위한 분수의 덧셈과 뺄셈 미니게임 및 보스전 학습 앱!" />
+  <link rel="stylesheet" href="./src/style.css" />
+  <!-- Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Top Header & Player Info Bar -->
+    <header class="top-bar">
+      <div class="user-profile">
+        <div class="avatar-badge" id="user-avatar">🧙‍♂️</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">상산초 용사</div>
+          <div class="user-stats" id="user-stats-display">클리어: 0회 | 보스: 0회</div>
+        </div>
+      </div>
+
+      <div class="user-gold-box">
+        <span class="gold-icon">🪙</span>
+        <span id="user-gold-display">50</span> G
+      </div>
+
+      <div class="auth-btns">
+        <button id="btn-google-login" class="btn-sm btn-google">Google 로그인</button>
+        <button id="btn-guest-login" class="btn-sm btn-guest">익명 로그인</button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: LOBBY SCREEN -->
+    <main id="view-lobby" class="view-screen active">
+      <div class="game-title">
+        <h1>⚔️ 진천상산초 4학년 1반<br>분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
+        <p>미니게임을 풀어 골드를 얻고, 100 골드로 분수 보스를 퇴치하자!</p>
+      </div>
+
+      <!-- Boss Dungeon & Hall of Fame Banners -->
+      <div class="action-banner">
+        <div id="card-boss-dungeon" class="banner-card boss-card">
+          <div class="banner-icon">👹</div>
+          <div class="banner-text">
+            <h3>보스 던전 도전!</h3>
+            <p>100 Gold 필요 (10문제 배틀)</p>
+          </div>
+        </div>
+
+        <div id="card-hall-of-fame" class="banner-card hall-card">
+          <div class="banner-icon">🏆</div>
+          <div class="banner-text">
+            <h3>명예의 전당</h3>
+            <p>골드 & 클리어 Top 10 랭킹</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Mini-Game Selection Grid -->
+      <h2 style="margin-bottom: 1rem; width: 100%; text-align: left;">⚔️ 6가지 미니게임 선택</h2>
+      <div class="minigame-grid" id="minigame-grid-container">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </main>
+
+    <!-- VIEW 2: MINIGAME SCREEN -->
+    <main id="view-minigame" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 로비로 돌아가기</button>
+        <h2 id="minigame-title">진분수의 덧셈</h2>
+        <div class="timer-box">⏱️ <span id="game-timer">25</span>s</div>
+      </div>
+
+      <div class="question-card">
+        <div id="question-render-box">
+          <!-- Fraction math expression rendered here -->
+        </div>
+
+        <!-- Visual Fraction Bar Hint -->
+        <div class="visual-hint-container">
+          <span class="hint-label">💡 분수 시각 가이드 (분모 쪼개기)</span>
+          <div class="fraction-bars-wrap" id="visual-bars-box">
+            <!-- Visual bars rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="options-grid" id="options-grid-box">
+        <!-- 4 Option Buttons rendered here -->
+      </div>
+    </main>
+
+    <!-- VIEW 3: BOSS BATTLE SCREEN -->
+    <main id="view-boss" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 도망치기</button>
+        <h2>👹 분수 드래곤 보스전!</h2>
+        <div class="timer-box">⏱️ <span id="boss-timer">60</span>s</div>
+      </div>
+
+      <div class="boss-card-container">
+        <div class="boss-avatar">🐲</div>
+        <h3>대마왕 분수 드래곤</h3>
+        <div class="boss-hp-bar-bg">
+          <div class="boss-hp-bar-fill" id="boss-hp-fill"></div>
+          <div class="boss-hp-text"><span id="boss-hp-current">100</span> / 100 HP</div>
+        </div>
+        <p style="margin-top: 0.5rem; font-size: 0.95rem;" id="boss-progress-text">문제 1 / 10</p>
+      </div>
+
+      <div class="question-card">
+        <div id="boss-question-render-box">
+          <!-- Boss Math Question -->
+        </div>
+      </div>
+
+      <div class="options-grid" id="boss-options-grid-box">
+        <!-- 4 Option Buttons -->
+      </div>
+    </main>
+
+    <!-- VIEW 4: HALL OF FAME SCREEN -->
+    <main id="view-hall" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 로비로 돌아가기</button>
+        <h2>🏆 4학년 1반 명예의 전당 Top 10</h2>
+        <div></div>
+      </div>
+
+      <div class="hall-container">
+        <div class="tab-nav">
+          <button id="tab-gold-rank" class="tab-btn active">🪙 골드 부자 왕 Top 10</button>
+          <button id="tab-clears-rank" class="tab-btn">⚡ 미니게임 마스터 Top 10</button>
+        </div>
+
+        <div class="rank-list" id="rank-list-box">
+          <!-- Rank list rendered here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- RESULT / MESSAGE MODAL -->
+    <div class="modal-overlay" id="game-modal">
+      <div class="modal-card">
+        <div class="modal-title" id="modal-title-text">🎉 미니게임 완료!</div>
+        <p id="modal-body-text" style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 1rem;"></p>
+        <button class="btn-primary" id="modal-close-btn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
