@@ -9,14 +9,14 @@ import {
 } from './firebase.js';
 import { sound } from './soundEngine.js';
 
-// 🌟 1단계 ~ 6단계 순서대로 정렬된 모험 미션 🌟
+// 🏝️ 한 화면 S자 순서 배치 (3x3 Grid)
 export const MINI_GAMES = [
-  { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-1', align: 'left' },
-  { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-2', align: 'right' },
-  { id: 'natural_improper_add', stageNum: 3, title: '전사의 고원 🏜️', sub: '자연수+가분수', icon: '🏜️', themeClass: 'theme-3', align: 'left' },
-  { id: 'proper_sub', stageNum: 4, title: '도적의 도시 🏗️', sub: '진분수의 뺄셈', icon: '🏗️', themeClass: 'theme-4', align: 'right' },
-  { id: 'improper_sub', stageNum: 5, title: '해변 리조트 🏖️', sub: '가분수의 뺄셈', icon: '🏖️', themeClass: 'theme-5', align: 'left' },
-  { id: 'natural_improper_sub', stageNum: 6, title: '시계탑 ⚡', sub: '자연수-가분수', icon: '⚡', themeClass: 'theme-6', align: 'right' }
+  { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-1', gridPos: { col: 1, row: 1 } },
+  { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-2', gridPos: { col: 2, row: 1 } },
+  { id: 'natural_improper_add', stageNum: 3, title: '전사의 고원 🏜️', sub: '자연수+가분수', icon: '🏜️', themeClass: 'theme-3', gridPos: { col: 3, row: 1 } },
+  { id: 'proper_sub', stageNum: 4, title: '도적의 도시 🏗️', sub: '진분수의 뺄셈', icon: '🏗️', themeClass: 'theme-4', gridPos: { col: 3, row: 2 } },
+  { id: 'improper_sub', stageNum: 5, title: '해변 리조트 🏖️', sub: '가분수의 뺄셈', icon: '🏖️', themeClass: 'theme-5', gridPos: { col: 3, row: 3 } },
+  { id: 'natural_improper_sub', stageNum: 6, title: '시계탑 ⚡', sub: '자연수-가분수', icon: '⚡', themeClass: 'theme-6', gridPos: { col: 1, row: 3 } }
 ];
 
 // DOM Elements
@@ -139,66 +139,57 @@ function showModal(title, bodyText, onClose) {
   if (closeBtn) closeBtn.addEventListener('click', handler);
 }
 
-// 🌟 1단계 ~ 6단계 순서대로 명확히 따라가는 빅토리아 모험 트레일 렌더링 🌟
-function renderOrderedMapTrail() {
-  const container = document.getElementById('ordered-map-trail-container');
+// 🏝️ 한 화면에 스크롤 없이 들어오는 컴팩트 아일랜드 맵 렌더링 🏝️
+function renderCompactIslandGrid() {
+  const container = document.getElementById('compact-island-grid-box');
   if (!container) return;
   container.innerHTML = '';
 
+  for (let r = 1; r <= 3; r++) {
+    for (let c = 1; c <= 3; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'sector-cell';
+      cell.dataset.col = c;
+      cell.dataset.row = r;
+      container.appendChild(cell);
+    }
+  }
+
   MINI_GAMES.forEach((game, idx) => {
-    const row = document.createElement('div');
-    row.className = `trail-row ${game.align}`;
-
-    const card = document.createElement('div');
-    card.className = `map-island-card ${game.themeClass}`;
-    card.innerHTML = `
-      <div class="stage-order-badge">STAGE ${game.stageNum}</div>
-      <div class="card-icon">${game.icon}</div>
-      <div class="card-title">${game.title}</div>
-      <div class="card-sub">${game.sub}</div>
-      <div class="card-tag">⏱️ 25초 도전</div>
-    `;
-
-    card.addEventListener('click', () => {
-      sound.playClick();
-      startSequentialMissionFlow(idx);
-    });
-
-    row.appendChild(card);
-    container.appendChild(row);
-
-    if (idx < MINI_GAMES.length - 1) {
-      const connector = document.createElement('div');
-      connector.className = 'trail-connector';
-      connector.innerHTML = '<div class="connector-line"></div>';
-      container.appendChild(connector);
+    const cell = container.querySelector(`.sector-cell[data-col="${game.gridPos.col}"][data-row="${game.gridPos.row}"]`);
+    if (cell) {
+      const node = document.createElement('div');
+      node.className = `compact-node ${game.themeClass}`;
+      node.innerHTML = `
+        <div class="node-order-badge">STAGE ${game.stageNum}</div>
+        <div class="node-icon-emoji">${game.icon}</div>
+        <div class="node-title-text">${game.title}</div>
+        <div class="node-sub-text">${game.sub}</div>
+      `;
+      node.addEventListener('click', () => {
+        sound.playClick();
+        startSequentialMissionFlow(idx);
+      });
+      cell.appendChild(node);
     }
   });
 
-  const bossConnector = document.createElement('div');
-  bossConnector.className = 'trail-connector';
-  bossConnector.innerHTML = '<div class="connector-line" style="background: repeating-linear-gradient(to bottom, #ef4444, #ef4444 8px, transparent 8px, transparent 16px); box-shadow:0 0 15px #ef4444;"></div>';
-  container.appendChild(bossConnector);
-
-  const bossRow = document.createElement('div');
-  bossRow.className = 'trail-row center';
-  const bossCard = document.createElement('div');
-  bossCard.className = 'map-island-card theme-boss';
-  bossCard.innerHTML = `
-    <div class="stage-order-badge" style="background:#450a0a; color:#fca5a5;">FINAL BOSS</div>
-    <div class="card-icon">🐲</div>
-    <div class="card-title" style="color:#fecdd3;">마왕의 둥지</div>
-    <div class="card-sub" style="color:#f87171;">대마왕 분수 드래곤 보스전</div>
-    <div class="card-tag" style="background:rgba(239, 68, 68, 0.4); border:1px solid #f87171;">⚔️ 100 Gold 소모</div>
-  `;
-
-  bossCard.addEventListener('click', () => {
-    sound.playClick();
-    document.getElementById('card-boss-dungeon').click();
-  });
-
-  bossRow.appendChild(bossCard);
-  container.appendChild(bossRow);
+  const centerCell = container.querySelector(`.sector-cell[data-col="2"][data-row="2"]`);
+  if (centerCell) {
+    const bossNode = document.createElement('div');
+    bossNode.className = 'compact-node theme-boss';
+    bossNode.innerHTML = `
+      <div class="node-order-badge" style="background:#450a0a; color:#fca5a5;">BOSS</div>
+      <div class="node-icon-emoji">🐲</div>
+      <div class="node-title-text" style="color:#fecdd3;">마왕의 둥지</div>
+      <div class="node-sub-text" style="color:#f87171;">보스전 (100G)</div>
+    `;
+    bossNode.addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('card-boss-dungeon').click();
+    });
+    centerCell.appendChild(bossNode);
+  }
 }
 
 // Initialize App
@@ -289,8 +280,8 @@ async function initApp() {
     });
   });
 
-  // 순서대로 배치된 모험 지도 트레일 렌더링
-  renderOrderedMapTrail();
+  // 한 화면 컴팩트 아일랜드 맵 렌더링
+  renderCompactIslandGrid();
 
   // Boss Card Listener
   const bossCard = document.getElementById('card-boss-dungeon');
