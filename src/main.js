@@ -53,18 +53,13 @@ function updateUserUI() {
   if (userStatsEl) userStatsEl.innerText = `클리어: ${u.clears || 0}회 | 보스: ${u.bossKills || 0}회`;
   if (userGoldEl) userGoldEl.innerText = u.gold || 0;
 
-  // 🌟 Auth Button State 원상복구 🌟
+  // 🌟 구글 로그인 & 익명 로그인 상시 노출 처리 🌟
   if (btnGoogleLogin && btnGuestLogin) {
-    if (u.uid && !u.uid.startsWith('guest_local')) {
-      btnGoogleLogin.style.display = 'none';
-      btnGuestLogin.innerText = '🚪 로그아웃';
-      btnGuestLogin.className = 'btn-sm btn-guest';
-    } else {
-      btnGoogleLogin.style.display = 'inline-block';
-      btnGoogleLogin.innerText = 'Google 로그인';
-      btnGuestLogin.innerText = '👤 익명 로그인';
-      btnGuestLogin.className = 'btn-sm btn-guest';
-    }
+    btnGoogleLogin.style.display = 'inline-block';
+    btnGoogleLogin.innerText = 'Google 로그인';
+    btnGuestLogin.style.display = 'inline-block';
+    btnGuestLogin.innerText = (u.uid && !u.uid.startsWith('guest_local')) ? '🚪 로그아웃' : '👤 익명 로그인';
+    btnGuestLogin.className = 'btn-sm btn-guest';
   }
 }
 
