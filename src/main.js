@@ -1,4 +1,4 @@
-import { gameManager, MINI_GAMES } from './gameLogic.js';
+import { gameManager } from './gameLogic.js';
 import { 
   loginWithGoogle, 
   loginAnonymously, 
@@ -8,6 +8,16 @@ import {
   ensureFirebaseInit
 } from './firebase.js';
 import { sound } from './soundEngine.js';
+
+// 🍁 메이플스토리 아일랜드 테마 스테이지 설정 🍁
+export const MINI_GAMES = [
+  { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-forest', gridPos: { col: 2, row: 3 } },
+  { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-forest', gridPos: { col: 3, row: 2 } },
+  { id: 'natural_improper_add', stageNum: 3, title: '전사의 고원 🏜️', sub: '자연수+가분수', icon: '🏜️', themeClass: 'theme-desert', gridPos: { col: 2, row: 1 } },
+  { id: 'proper_sub', stageNum: 4, title: '도적의 도시 🏗️', sub: '진분수의 뺄셈', icon: '🏗️', themeClass: 'theme-city', gridPos: { col: 1, row: 2 } },
+  { id: 'improper_sub', stageNum: 5, title: '해변 리조트 🏖️', sub: '가분수의 뺄셈', icon: '🏖️', themeClass: 'theme-beach', gridPos: { col: 1, row: 3 } },
+  { id: 'natural_improper_sub', stageNum: 6, title: '시계탑 ⚡', sub: '자연수-가분수', icon: '⚡', themeClass: 'theme-tower', gridPos: { col: 1, row: 1 } }
+];
 
 // DOM Elements
 const userAvatarEl = document.getElementById('user-avatar');
@@ -53,7 +63,7 @@ function updateUserUI() {
   if (userStatsEl) userStatsEl.innerText = `클리어: ${u.clears || 0}회 | 보스: ${u.bossKills || 0}회`;
   if (userGoldEl) userGoldEl.innerText = u.gold || 0;
 
-  // 🌟 구글 로그인 & 익명 로그인 상시 노출 처리 🌟
+  // Auth Button State
   if (btnGoogleLogin && btnGuestLogin) {
     btnGoogleLogin.style.display = 'inline-block';
     btnGoogleLogin.innerText = 'Google 로그인';
@@ -63,7 +73,7 @@ function updateUserUI() {
   }
 }
 
-// 🌟 2개 버튼 ('홈으로' 왼쪽, '다음으로' 오른쪽) 지원 팝업 🌟
+// 2개 버튼 ('홈으로' 왼쪽, '다음으로' 오른쪽) 지원 팝업
 function showMinigameEndModal(stageResult, stageIdx) {
   modalTitleEl.innerText = `⏰ ${stageResult.stageName} 시간 종료!`;
   modalBodyEl.innerHTML = `25초 제한시간이 종료되었습니다!<br><br>획득 점수: <strong>${stageResult.score}점</strong><br>획득 골드: <strong>+${stageResult.earnedGold} G</strong>`;
@@ -127,6 +137,59 @@ function showModal(title, bodyText, onClose) {
     if (onClose) onClose();
   };
   if (closeBtn) closeBtn.addEventListener('click', handler);
+}
+
+// 🍁 메이플스토리 빅토리아 아일랜드 월드 맵 렌더링 🍁
+function renderVictoriaIslandMap() {
+  const container = document.getElementById('victoria-island-grid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  for (let r = 1; r <= 3; r++) {
+    for (let c = 1; c <= 3; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'map-sector-cell';
+      cell.dataset.col = c;
+      cell.dataset.row = r;
+      container.appendChild(cell);
+    }
+  }
+
+  MINI_GAMES.forEach((game, idx) => {
+    const cell = container.querySelector(`.map-sector-cell[data-col="${game.gridPos.col}"][data-row="${game.gridPos.row}"]`);
+    if (cell) {
+      const node = document.createElement('div');
+      node.className = `island-node ${game.themeClass}`;
+      node.innerHTML = `
+        <div class="island-badge">STAGE ${game.stageNum}</div>
+        <div class="island-icon">${game.icon}</div>
+        <div class="island-name">${game.title}</div>
+        <div class="island-sub">${game.sub}</div>
+      `;
+      node.addEventListener('click', () => {
+        sound.playClick();
+        startSequentialMissionFlow(idx);
+      });
+      cell.appendChild(node);
+    }
+  });
+
+  const centerCell = container.querySelector(`.map-sector-cell[data-col="2"][data-row="2"]`);
+  if (centerCell) {
+    const bossNode = document.createElement('div');
+    bossNode.className = 'island-node boss-center-node';
+    bossNode.innerHTML = `
+      <div class="island-badge" style="background:#450a0a; color:#fca5a5;">BOSS DUNGEON</div>
+      <div class="island-icon">🐲</div>
+      <div class="island-name" style="color:#fecdd3;">마왕의 둥지</div>
+      <div class="island-sub" style="color:#f87171;">슬리피우드 보스전</div>
+    `;
+    bossNode.addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('card-boss-dungeon').click();
+    });
+    centerCell.appendChild(bossNode);
+  }
 }
 
 // Initialize App
@@ -217,7 +280,8 @@ async function initApp() {
     });
   });
 
-  renderMinigameGrid();
+  // 메이플스토리 아일랜드 월드 맵 렌더링
+  renderVictoriaIslandMap();
 
   // Boss Card Listener
   const bossCard = document.getElementById('card-boss-dungeon');
@@ -256,61 +320,15 @@ async function initApp() {
       renderLeaderboard('gold');
     });
   }
-
-  // Hall of Fame Tabs
-  const tabGold = document.getElementById('tab-gold-rank');
-  const tabClears = document.getElementById('tab-clears-rank');
-  if (tabGold && tabClears) {
-    tabGold.addEventListener('click', () => {
-      sound.playClick();
-      tabGold.classList.add('active');
-      tabClears.classList.remove('active');
-      renderLeaderboard('gold');
-    });
-
-    tabClears.addEventListener('click', () => {
-      sound.playClick();
-      tabClears.classList.add('active');
-      tabGold.classList.remove('active');
-      renderLeaderboard('clears');
-    });
-  }
 }
 
-// Render Mini-Game Grid Cards
-function renderMinigameGrid() {
-  const container = document.getElementById('minigame-grid-container');
-  if (!container) return;
-  container.innerHTML = '';
-
-  MINI_GAMES.forEach((game, idx) => {
-    const card = document.createElement('div');
-    card.className = 'game-card';
-    card.innerHTML = `
-      <div class="stage-badge">단계 ${game.stageNum}</div>
-      <div class="game-card-icon">${game.icon}</div>
-      <div class="game-card-title">${game.title}</div>
-      <div class="game-card-desc">${game.desc}</div>
-      <div class="game-card-tag" style="background:${game.color}44; border: 1px solid ${game.color};">미션 ${idx + 1} / 6단계</div>
-    `;
-
-    card.addEventListener('click', () => {
-      sound.playClick();
-      startSequentialMissionFlow(idx);
-    });
-
-    container.appendChild(card);
-  });
-}
-
-// Start Sequential Mission Flow (Stage 1 to 6)
 function startSequentialMissionFlow(stageIdx) {
   const curGame = MINI_GAMES[stageIdx];
-  document.getElementById('minigame-title').innerText = curGame.title;
+  document.getElementById('minigame-title').innerText = `미션 ${curGame.stageNum}: ${curGame.title}`;
   
   const stepIndicator = document.getElementById('mission-step-indicator');
   if (stepIndicator) {
-    stepIndicator.innerHTML = `<span>🎯 현재 미션: <strong>${stageIdx + 1} / 6 단계</strong> (${curGame.title})</span>`;
+    stepIndicator.innerHTML = `<span>🎯 현재 장소: <strong>${curGame.title}</strong> (${curGame.sub})</span>`;
   }
 
   switchView('minigame');
