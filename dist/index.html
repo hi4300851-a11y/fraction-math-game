@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!!</title>
   <meta name="description" content="진천상산초등학교 4학년 1반 분수 용사들을 위한 6단계 순차 미션 & 보스전 학습 앱!" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,7 +209,7 @@
 </head>
 <body>
   <div id="app">
-    <!-- Header (상단 프로필 및 구글 로그인/익명 로그인 버튼 항상 보임) -->
+    <!-- Header (상단 프로필 및 Google 로그인 / 익명 로그인 버튼) -->
     <header class="top-bar">
       <div class="user-profile">
         <div class="avatar-badge" id="user-avatar">🧙‍♂️</div>
@@ -219,7 +222,7 @@
         <span class="gold-icon">🪙</span>
         <span id="user-gold-display">50</span> G
       </div>
-      <!-- 🌟 Google 로그인 및 👤 익명 로그인 버튼 명시적 배치 🌟 -->
+      <!-- 🔑 Google 로그인 및 👤 익명 로그인 버튼 배치 -->
       <div class="auth-btns">
         <button id="btn-google-login" class="btn-sm btn-google" style="display: inline-block !important;">Google 로그인</button>
         <button id="btn-guest-login" class="btn-sm btn-guest" style="display: inline-block !important;">👤 익명 로그인</button>
@@ -311,7 +314,7 @@
       </div>
     </main>
 
-    <!-- 🌟 결과 팝업창 ('홈으로' 왼쪽, '다음으로' 오른쪽 순서) 🌟 -->
+    <!-- 결과 팝업 모달 ('홈으로' 왼쪽, '다음으로' 오른쪽) -->
     <div class="modal-overlay" id="game-modal">
       <div class="modal-card">
         <div class="modal-title" id="modal-title-text">⏰ 미션 결과</div>
@@ -325,9 +328,6 @@
   </div>
 
   <script>
-    // =========================================================
-    // 🌟 Firebase Auth & Google 로그인 & 익명 로그인 완벽 복원 🌟
-    // =========================================================
     const firebaseConfig = {
       apiKey: "AIzaSyCeg7-gSm2eWWigr5wVnSIyLtaSfut09-Y",
       authDomain: "th-math-4edfc.firebaseapp.com",
@@ -403,9 +403,6 @@
       }
     }
 
-    // =========================================================
-    // 🌟 완전무결 25초 타임아웃 미니게임 및 로직 🌟
-    // =========================================================
     const MINI_GAMES = [
       { id: 'proper_add', stageNum: 1, title: '미션 1: 진분수의 덧셈', icon: '➕', desc: '분모가 같은 진분수끼리 더해요!', color: '#4facfe' },
       { id: 'improper_add', stageNum: 2, title: '미션 2: 가분수의 덧셈', icon: '🚀', desc: '1보다 큰 가분수들을 신나게 더해요!', color: '#00f2fe' },
@@ -516,7 +513,6 @@
       updateUserUI();
     }
 
-    // 🌟 사용자 로그인 및 상태 업데이트 UI 🌟
     function updateUserUI() {
       document.getElementById('user-name-display').innerText = userData.displayName;
       document.getElementById('user-stats-display').innerText = `클리어: ${userData.clears}회 | 보스: ${userData.bossKills}회`;
@@ -649,7 +645,6 @@
       barsBox.appendChild(bar2);
     }
 
-    // 🌟 25초 종료 팝업 및 ['홈으로', '다음으로'] 버튼 클릭 바인딩 🌟
     function endMinigameAndShowModal() {
       isMinigameActive = false;
       clearTimer();
@@ -704,11 +699,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Firebase 로그인 초기화
       initFirebase();
       updateUserUI();
 
-      // 우측 상단 로그인 버튼 이벤트
       const btnGoogle = document.getElementById('btn-google-login');
       if (btnGoogle) {
         btnGoogle.addEventListener('click', doGoogleLogin);
