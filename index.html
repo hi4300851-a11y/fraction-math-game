@@ -117,11 +117,10 @@
     .banner-icon { font-size: 2.8rem; }
 
     /* ========================================================= */
-    /* 🍁 메이플스토리 빅토리아 아일랜드 스타일 월드 맵 UI 🍁 */
+    /* 🗺️ 순서대로 정렬된 메이플 스타일 분수 모험 지도 🗺️ */
     /* ========================================================= */
     .victoria-map-frame {
       width: 100%;
-      min-height: 620px;
       background: #7dd3fc;
       background-image: 
         linear-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px),
@@ -130,7 +129,7 @@
       background-size: 40px 40px, 40px 40px, 100% 100%;
       border: 6px solid #d97706;
       border-radius: 28px;
-      padding: 1.5rem;
+      padding: 2rem 1.5rem;
       position: relative;
       box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.6);
       margin-bottom: 2rem;
@@ -157,7 +156,7 @@
       100% { transform: translateY(12px) scale(1.05); }
     }
 
-    /* 메이플 스타일 양피지 두루마리 제목 (Victoria Island Banner) */
+    /* 양피지 두루마리 제목 */
     .scroll-banner-title {
       position: absolute;
       top: 15px;
@@ -165,53 +164,75 @@
       background: #fef3c7;
       border: 4px solid #78350f;
       border-radius: 14px;
-      padding: 0.8rem 1.6rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(217, 119, 6, 0.2);
+      padding: 0.6rem 1.4rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       z-index: 10;
       text-align: center;
     }
     .scroll-banner-title h3 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: #78350f;
       text-shadow: 1px 1px 0px #fef08a;
-      letter-spacing: 1px;
     }
     .scroll-banner-title p {
       font-size: 0.85rem;
       color: #92400e;
-      margin-top: 2px;
     }
 
-    /* 섬 지형 그리드 레이아웃 (빅토리아 아일랜드 섬들) */
-    .island-map-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 1.2rem;
+    /* 🗺️ 1단계 ~ 6단계 순서대로 지그재그 코스 연결 트레일 🗺️ */
+    .ordered-map-trail {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
       width: 100%;
-      height: 100%;
-      min-height: 540px;
       position: relative;
       z-index: 5;
       padding-top: 3.5rem;
+      align-items: center;
     }
 
-    /* 메이플 아일랜드 구역 셀 */
-    .map-sector-cell {
+    .trail-row {
       display: flex;
+      width: 100%;
       align-items: center;
-      justify-content: center;
       position: relative;
     }
+    .trail-row.left { justify-content: flex-start; padding-left: 6%; }
+    .trail-row.right { justify-content: flex-end; padding-right: 6%; }
+    .trail-row.center { justify-content: center; }
 
-    /* 개별 모험 섬 노드 (Island Node) */
-    .island-node {
+    /* 황금 화살표 모험 연결 경로 다리 (Ordered Path Bridge) */
+    .trail-connector {
       width: 100%;
-      max-width: 240px;
-      background: linear-gradient(135deg, #fef08a 0%, #fde047 50%, #eab308 100%);
-      border: 4px solid #854d0e;
-      border-radius: 30px;
-      padding: 1.1rem 0.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: -0.6rem 0;
+    }
+    .connector-line {
+      height: 35px;
+      width: 6px;
+      background: repeating-linear-gradient(to bottom, #fbbf24, #fbbf24 8px, transparent 8px, transparent 16px);
+      position: relative;
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+    }
+    .connector-line::after {
+      content: '⬇️';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+    }
+
+    /* 메이플 아일랜드 스테이지 카드 노드 */
+    .map-island-card {
+      width: 280px;
+      background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #ca8a04 100%);
+      border: 4px solid #713f12;
+      border-radius: 26px;
+      padding: 1.2rem 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -221,63 +242,69 @@
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
     }
-    .island-node:hover {
-      transform: translateY(-10px) scale(1.06);
-      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(253, 224, 71, 0.9);
+    .map-island-card:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(253, 224, 71, 0.9);
       border-color: #ffffff;
       background: linear-gradient(135deg, #ffffff 0%, #fde047 60%, #eab308 100%);
     }
 
-    .island-node.theme-forest { background: linear-gradient(135deg, #bbf7d0 0%, #4ade80 50%, #16a34a 100%); border-color: #14532d; }
-    .island-node.theme-desert { background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #ca8a04 100%); border-color: #713f12; }
-    .island-node.theme-city { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #475569 100%); border-color: #0f172a; }
-    .island-node.theme-canyon { background: linear-gradient(135deg, #fecdd3 0%, #fb7185 50%, #e11d48 100%); border-color: #881337; }
-    .island-node.theme-beach { background: linear-gradient(135deg, #fed7aa 0%, #fb923c 50%, #ea580c 100%); border-color: #7c2d12; }
-    .island-node.theme-tower { background: linear-gradient(135deg, #e0e7ff 0%, #818cf8 50%, #4f46e5 100%); border-color: #1e1b4b; }
+    .map-island-card.theme-1 { background: linear-gradient(135deg, #bbf7d0 0%, #4ade80 50%, #16a34a 100%); border-color: #14532d; }
+    .map-island-card.theme-2 { background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%); border-color: #0c4a6e; }
+    .map-island-card.theme-3 { background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #ca8a04 100%); border-color: #713f12; }
+    .map-island-card.theme-4 { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #475569 100%); border-color: #0f172a; }
+    .map-island-card.theme-5 { background: linear-gradient(135deg, #fed7aa 0%, #fb923c 50%, #ea580c 100%); border-color: #7c2d12; }
+    .map-island-card.theme-6 { background: linear-gradient(135deg, #e0e7ff 0%, #818cf8 50%, #4f46e5 100%); border-color: #1e1b4b; }
 
-    /* 중앙 최종 보스 둥지 노드 */
-    .island-node.boss-center-node {
-      grid-column: 2;
-      grid-row: 2;
-      max-width: 260px;
+    /* 최종 보스전 노드 */
+    .map-island-card.theme-boss {
+      width: 310px;
       background: linear-gradient(135deg, #fca5a5 0%, #ef4444 50%, #991b1b 100%);
       border: 5px solid #450a0a;
-      box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), inset 0 -6px 0 rgba(127, 29, 29, 0.6);
-      animation: pulseBossNode 2s infinite ease-in-out;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.9), inset 0 -6px 0 rgba(127, 29, 29, 0.6);
+      animation: pulseBossCard 2s infinite ease-in-out;
     }
-
-    @keyframes pulseBossNode {
+    @keyframes pulseBossCard {
       0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); }
-      50% { transform: scale(1.04); box-shadow: 0 0 40px rgba(239, 68, 68, 1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(239, 68, 68, 1); }
     }
 
-    .island-badge {
+    .stage-order-badge {
       position: absolute;
-      top: -14px;
+      top: -15px;
       background: #78350f;
       color: #fef08a;
       border: 2px solid #ffffff;
-      padding: 0.2rem 0.8rem;
-      border-radius: 16px;
-      font-size: 0.85rem;
+      padding: 0.25rem 1rem;
+      border-radius: 18px;
+      font-size: 0.9rem;
       font-weight: bold;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    .island-icon {
-      font-size: 3rem;
+
+    .card-icon {
+      font-size: 3.2rem;
       margin-top: 0.4rem;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
     }
-    .island-name {
-      font-size: 1.25rem;
+    .card-title {
+      font-size: 1.35rem;
       color: #ffffff;
       text-shadow: 1px 2px 4px rgba(0,0,0,0.8);
       margin-top: 0.2rem;
     }
-    .island-sub {
-      font-size: 0.85rem;
+    .card-sub {
+      font-size: 0.9rem;
       color: #fef08a;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    }
+    .card-tag {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+      color: #ffffff;
+      margin-top: 0.4rem;
     }
 
     .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 1rem; }
@@ -320,7 +347,7 @@
     .boss-hp-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.9rem; font-weight: bold; }
     .hall-container { width: 100%; background: var(--card-bg); backdrop-filter: blur(12px); border: 2px solid var(--card-border); border-radius: 24px; padding: 1.5rem; }
 
-    /* 결과 팝업 모달 & ('홈으로' 왼쪽, '다음으로' 오른쪽) 버튼 그룹 스타일 */
+    /* 결과 팝업 모달 ('홈으로' 왼쪽, '다음으로' 오른쪽) */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center;
@@ -383,7 +410,7 @@
       </div>
     </header>
 
-    <!-- VIEW 1: 메인 로비 화면 (메이플스토리 아일랜드 월드 맵 포함) -->
+    <!-- VIEW 1: 메인 로비 화면 (순서대로 연결된 분수 모험 지도) -->
     <main id="view-lobby" class="view-screen active">
       <div class="game-title">
         <h1>⚔️ 진천상산초 4학년 1반<br>분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
@@ -413,7 +440,7 @@
         </div>
       </div>
 
-      <!-- 🍁 메이플스토리 빅토리아 아일랜드 스타일 월드 맵 🍁 -->
+      <!-- 🗺️ 1단계 ~ 6단계 순서대로 경로 연결된 빅토리아 아일랜드 모험 지도 🗺️ -->
       <div class="victoria-map-frame">
         <!-- 뭉게 구름 효과 -->
         <div class="map-cloud cloud-1">☁️</div>
@@ -424,12 +451,12 @@
         <!-- 황금 두루마리 제목 칭호판 -->
         <div class="scroll-banner-title">
           <h3>Victoria Island</h3>
-          <p>분수 월드 아일랜드 🗺️</p>
+          <p>분수 월드 1단계~6단계 모험 로드 🗺️</p>
         </div>
 
-        <!-- 3x3 섬 지도 그리드 -->
-        <div class="island-map-container" id="victoria-island-grid">
-          <!-- 스크립트에서 6개 지역 + 중앙 보스 둥지가 배치됩니다 -->
+        <!-- 1단계부터 6단계 및 보스전까지 순서대로 연결된 모험 코스 -->
+        <div class="ordered-map-trail" id="ordered-map-trail-container">
+          <!-- 스크립트에서 순서대로 정렬 및 렌더링됩니다 -->
         </div>
       </div>
     </main>
@@ -575,14 +602,14 @@
       }
     }
 
-    // 🍁 메이플스토리 아일랜드 테마 스테이지 설정 🍁
+    // 🌟 1단계 ~ 6단계 순서대로 정렬된 모험 미션 🌟
     const MINI_GAMES = [
-      { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-forest', gridPos: { col: 2, row: 3 } },
-      { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-forest', gridPos: { col: 3, row: 2 } },
-      { id: 'natural_improper_add', stageNum: 3, title: '전사의 고원 🏜️', sub: '자연수+가분수', icon: '🏜️', themeClass: 'theme-desert', gridPos: { col: 2, row: 1 } },
-      { id: 'proper_sub', stageNum: 4, title: '도적의 도시 🏗️', sub: '진분수의 뺄셈', icon: '🏗️', themeClass: 'theme-city', gridPos: { col: 1, row: 2 } },
-      { id: 'improper_sub', stageNum: 5, title: '해변 리조트 🏖️', sub: '가분수의 뺄셈', icon: '🏖️', themeClass: 'theme-beach', gridPos: { col: 1, row: 3 } },
-      { id: 'natural_improper_sub', stageNum: 6, title: '시계탑 ⚡', sub: '자연수-가분수', icon: '⚡', themeClass: 'theme-tower', gridPos: { col: 1, row: 1 } }
+      { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-1', align: 'left' },
+      { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-2', align: 'right' },
+      { id: 'natural_improper_add', stageNum: 3, title: '전사의 고원 🏜️', sub: '자연수+가분수', icon: '🏜️', themeClass: 'theme-3', align: 'left' },
+      { id: 'proper_sub', stageNum: 4, title: '도적의 도시 🏗️', sub: '진분수의 뺄셈', icon: '🏗️', themeClass: 'theme-4', align: 'right' },
+      { id: 'improper_sub', stageNum: 5, title: '해변 리조트 🏖️', sub: '가분수의 뺄셈', icon: '🏖️', themeClass: 'theme-5', align: 'left' },
+      { id: 'natural_improper_sub', stageNum: 6, title: '시계탑 ⚡', sub: '자연수-가분수', icon: '⚡', themeClass: 'theme-6', align: 'right' }
     ];
 
     let userData = {
@@ -871,58 +898,67 @@
       btnNext.onclick = handleNext;
     }
 
-    // 🍁 메이플스토리 빅토리아 아일랜드 월드 맵 렌더링 🍁
-    function renderVictoriaIslandMap() {
-      const container = document.getElementById('victoria-island-grid');
+    // 🌟 1단계 ~ 6단계 순서대로 명확히 따라가는 빅토리아 모험 트레일 렌더링 🌟
+    function renderOrderedMapTrail() {
+      const container = document.getElementById('ordered-map-trail-container');
       if (!container) return;
       container.innerHTML = '';
 
-      // 3x3 셀 초기화
-      for (let r = 1; r <= 3; r++) {
-        for (let c = 1; c <= 3; c++) {
-          const cell = document.createElement('div');
-          cell.className = 'map-sector-cell';
-          cell.dataset.col = c;
-          cell.dataset.row = r;
-          container.appendChild(cell);
-        }
-      }
-
-      // 6개 미션 아일랜드 노드 배치
       MINI_GAMES.forEach((game, idx) => {
-        const cell = container.querySelector(`.map-sector-cell[data-col="${game.gridPos.col}"][data-row="${game.gridPos.row}"]`);
-        if (cell) {
-          const node = document.createElement('div');
-          node.className = `island-node ${game.themeClass}`;
-          node.innerHTML = `
-            <div class="island-badge">STAGE ${game.stageNum}</div>
-            <div class="island-icon">${game.icon}</div>
-            <div class="island-name">${game.title}</div>
-            <div class="island-sub">${game.sub}</div>
-          `;
-          node.addEventListener('click', () => {
-            startMinigame(idx);
-          });
-          cell.appendChild(node);
+        // 스테이지 카드가 들어갈 행 (Row)
+        const row = document.createElement('div');
+        row.className = `trail-row ${game.align}`;
+
+        const card = document.createElement('div');
+        card.className = `map-island-card ${game.themeClass}`;
+        card.innerHTML = `
+          <div class="stage-order-badge">STAGE ${game.stageNum}</div>
+          <div class="card-icon">${game.icon}</div>
+          <div class="card-title">${game.title}</div>
+          <div class="card-sub">${game.sub}</div>
+          <div class="card-tag">⏱️ 25초 도전</div>
+        `;
+
+        card.addEventListener('click', () => {
+          startMinigame(idx);
+        });
+
+        row.appendChild(card);
+        container.appendChild(row);
+
+        // 다음 단계로 이어지는 화살표 경로선 (Bridge Connector)
+        if (idx < MINI_GAMES.length - 1) {
+          const connector = document.createElement('div');
+          connector.className = 'trail-connector';
+          connector.innerHTML = '<div class="connector-line"></div>';
+          container.appendChild(connector);
         }
       });
 
-      // 중앙 셀(2,2)에 보스 드래곤 둥지 노드 배치
-      const centerCell = container.querySelector(`.map-sector-cell[data-col="2"][data-row="2"]`);
-      if (centerCell) {
-        const bossNode = document.createElement('div');
-        bossNode.className = 'island-node boss-center-node';
-        bossNode.innerHTML = `
-          <div class="island-badge" style="background:#450a0a; color:#fca5a5;">BOSS DUNGEON</div>
-          <div class="island-icon">🐲</div>
-          <div class="island-name" style="color:#fecdd3;">마왕의 둥지</div>
-          <div class="island-sub" style="color:#f87171;">슬리피우드 보스전</div>
-        `;
-        bossNode.addEventListener('click', () => {
-          document.getElementById('card-boss-dungeon').click();
-        });
-        centerCell.appendChild(bossNode);
-      }
+      // 6단계 완료 후 최종 보스 던전으로 들어가는 연결선 및 보스 노드
+      const bossConnector = document.createElement('div');
+      bossConnector.className = 'trail-connector';
+      bossConnector.innerHTML = '<div class="connector-line" style="background: repeating-linear-gradient(to bottom, #ef4444, #ef4444 8px, transparent 8px, transparent 16px); box-shadow:0 0 15px #ef4444;"></div>';
+      container.appendChild(bossConnector);
+
+      const bossRow = document.createElement('div');
+      bossRow.className = 'trail-row center';
+      const bossCard = document.createElement('div');
+      bossCard.className = 'map-island-card theme-boss';
+      bossCard.innerHTML = `
+        <div class="stage-order-badge" style="background:#450a0a; color:#fca5a5;">FINAL BOSS</div>
+        <div class="card-icon">🐲</div>
+        <div class="card-title" style="color:#fecdd3;">마왕의 둥지</div>
+        <div class="card-sub" style="color:#f87171;">대마왕 분수 드래곤 보스전</div>
+        <div class="card-tag" style="background:rgba(239, 68, 68, 0.4); border:1px solid #f87171;">⚔️ 100 Gold 소모</div>
+      `;
+
+      bossCard.addEventListener('click', () => {
+        document.getElementById('card-boss-dungeon').click();
+      });
+
+      bossRow.appendChild(bossCard);
+      container.appendChild(bossRow);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -939,8 +975,8 @@
         btnGuest.addEventListener('click', doGuestAuth);
       }
 
-      // 🍁 메이플스토리 아일랜드 월드 맵 렌더링
-      renderVictoriaIslandMap();
+      // 순서대로 배치된 모험 지도 트레일 렌더링
+      renderOrderedMapTrail();
 
       document.getElementById('btn-start-sequential-mission').addEventListener('click', () => {
         startMinigame(0);
