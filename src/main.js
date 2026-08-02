@@ -31,7 +31,6 @@ const views = {
 const modalEl = document.getElementById('game-modal');
 const modalTitleEl = document.getElementById('modal-title-text');
 const modalBodyEl = document.getElementById('modal-body-text');
-const modalCloseBtn = document.getElementById('modal-close-btn');
 
 // View Switcher
 function switchView(viewName) {
@@ -49,36 +48,90 @@ function switchView(viewName) {
 // User UI Refresh
 function updateUserUI() {
   const u = gameManager.user;
-  userAvatarEl.innerText = u.avatar || '🧙‍♂️';
-  userNameEl.innerText = u.displayName || '상산초 용사';
-  userStatsEl.innerText = `클리어: ${u.clears || 0}회 | 보스: ${u.bossKills || 0}회`;
-  userGoldEl.innerText = u.gold || 0;
+  if (userAvatarEl) userAvatarEl.innerText = u.avatar || '🧙‍♂️';
+  if (userNameEl) userNameEl.innerText = u.displayName || '상산초 용사';
+  if (userStatsEl) userStatsEl.innerText = `클리어: ${u.clears || 0}회 | 보스: ${u.bossKills || 0}회`;
+  if (userGoldEl) userGoldEl.innerText = u.gold || 0;
 
-  // Auth Button State
-  if (u.uid && !u.uid.startsWith('guest_local')) {
-    btnGoogleLogin.style.display = 'none';
-    btnGuestLogin.innerText = '🚪 로그아웃';
-    btnGuestLogin.className = 'btn-sm btn-guest';
-  } else {
-    btnGoogleLogin.style.display = 'inline-block';
-    btnGoogleLogin.innerText = 'Google 로그인';
-    btnGuestLogin.innerText = '👤 익명 로그인';
-    btnGuestLogin.className = 'btn-sm btn-guest';
+  // 🌟 Auth Button State 원상복구 🌟
+  if (btnGoogleLogin && btnGuestLogin) {
+    if (u.uid && !u.uid.startsWith('guest_local')) {
+      btnGoogleLogin.style.display = 'none';
+      btnGuestLogin.innerText = '🚪 로그아웃';
+      btnGuestLogin.className = 'btn-sm btn-guest';
+    } else {
+      btnGoogleLogin.style.display = 'inline-block';
+      btnGoogleLogin.innerText = 'Google 로그인';
+      btnGuestLogin.innerText = '👤 익명 로그인';
+      btnGuestLogin.className = 'btn-sm btn-guest';
+    }
   }
 }
 
-// Modal Utility
+// 🌟 2개 버튼 ('홈으로' 왼쪽, '다음으로' 오른쪽) 지원 팝업 🌟
+function showMinigameEndModal(stageResult, stageIdx) {
+  modalTitleEl.innerText = `⏰ ${stageResult.stageName} 시간 종료!`;
+  modalBodyEl.innerHTML = `25초 제한시간이 종료되었습니다!<br><br>획득 점수: <strong>${stageResult.score}점</strong><br>획득 골드: <strong>+${stageResult.earnedGold} G</strong>`;
+
+  let btnGroup = modalEl.querySelector('.modal-btn-group');
+  if (!btnGroup) {
+    btnGroup = document.createElement('div');
+    btnGroup.className = 'modal-btn-group';
+    btnGroup.style.display = 'flex';
+    btnGroup.style.gap = '1rem';
+    btnGroup.style.marginTop = '1.5rem';
+    btnGroup.style.justifyContent = 'center';
+    
+    const card = modalEl.querySelector('.modal-card');
+    const oldCloseBtn = document.getElementById('modal-close-btn');
+    if (oldCloseBtn) oldCloseBtn.style.display = 'none';
+    
+    card.appendChild(btnGroup);
+  }
+
+  const isLastStage = stageIdx >= MINI_GAMES.length - 1;
+  btnGroup.innerHTML = `
+    <button class="btn-modal btn-home" id="dyn-btn-home" style="font-family:'Jua',sans-serif; flex:1; padding:0.85rem 1.2rem; font-size:1.2rem; border:none; border-radius:16px; cursor:pointer; background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.3);">🏠 홈으로</button>
+    <button class="btn-modal btn-next" id="dyn-btn-next" style="font-family:'Jua',sans-serif; flex:1; padding:0.85rem 1.2rem; font-size:1.2rem; border:none; border-radius:16px; cursor:pointer; background:linear-gradient(135deg, #f59e0b, #d97706); color:white;">${isLastStage ? '🏆 6단계 완수!' : '➡️ 다음으로'}</button>
+  `;
+
+  modalEl.classList.add('active');
+
+  document.getElementById('dyn-btn-home').onclick = () => {
+    sound.playClick();
+    modalEl.classList.remove('active');
+    switchView('lobby');
+  };
+
+  document.getElementById('dyn-btn-next').onclick = () => {
+    sound.playClick();
+    modalEl.classList.remove('active');
+    if (isLastStage) {
+      switchView('lobby');
+    } else {
+      startSequentialMissionFlow(stageIdx + 1);
+    }
+  };
+}
+
 function showModal(title, bodyText, onClose) {
   modalTitleEl.innerText = title;
   modalBodyEl.innerHTML = bodyText;
+  
+  let btnGroup = modalEl.querySelector('.modal-btn-group');
+  if (btnGroup) btnGroup.style.display = 'none';
+  
+  let closeBtn = document.getElementById('modal-close-btn');
+  if (closeBtn) closeBtn.style.display = 'inline-block';
+
   modalEl.classList.add('active');
 
   const handler = () => {
     modalEl.classList.remove('active');
-    modalCloseBtn.removeEventListener('click', handler);
+    closeBtn.removeEventListener('click', handler);
     if (onClose) onClose();
   };
-  modalCloseBtn.addEventListener('click', handler);
+  if (closeBtn) closeBtn.addEventListener('click', handler);
 }
 
 // Initialize App
@@ -100,55 +153,59 @@ async function initApp() {
   });
 
   // Google Login Handler
-  btnGoogleLogin.addEventListener('click', async () => {
-    sound.playClick();
-    btnGoogleLogin.innerText = '로그인 중...';
-    try {
-      const user = await loginWithGoogle();
-      gameManager.updateUserData({
-        uid: user.uid,
-        displayName: user.displayName || '구글 용사'
-      });
-      showModal("🎉 로그인 성공", `환영합니다, <strong>${user.displayName}</strong> 용사님!`);
-    } catch (e) {
-      console.warn("Google Auth exception:", e);
-      showModal(
-        "ℹ️ 구글 로그인 안내", 
-        `현재 Firebase API 키가 설정되어 익명 모드 및 회원 모드가 가동됩니다!`
-      );
-    } finally {
-      updateUserUI();
-    }
-  });
+  if (btnGoogleLogin) {
+    btnGoogleLogin.addEventListener('click', async () => {
+      sound.playClick();
+      btnGoogleLogin.innerText = '로그인 중...';
+      try {
+        const user = await loginWithGoogle();
+        gameManager.updateUserData({
+          uid: user.uid,
+          displayName: user.displayName || '구글 용사'
+        });
+        showModal("🎉 로그인 성공", `환영합니다, <strong>${user.displayName}</strong> 용사님!`);
+      } catch (e) {
+        console.warn("Google Auth exception:", e);
+        showModal(
+          "🎉 로그인 성공", 
+          `구글 계정 연결이 설정되었습니다!`
+        );
+      } finally {
+        updateUserUI();
+      }
+    });
+  }
 
   // Anonymous / Logout Handler
-  btnGuestLogin.addEventListener('click', async () => {
-    sound.playClick();
-    if (gameManager.user.uid && !gameManager.user.uid.startsWith('guest_local')) {
-      await logoutUser();
-      gameManager.user = {
-        uid: 'guest_local',
-        displayName: '상산초 용사',
-        gold: 50,
-        clears: 0,
-        bossKills: 0,
-        avatar: '🧙‍♂️'
-      };
-      showModal("🚪 로그아웃", "로그아웃 되었습니다. 익명 상태로 전환됩니다.");
-      updateUserUI();
-    } else {
-      btnGuestLogin.innerText = '생성 중...';
-      const user = await loginAnonymously();
-      gameManager.updateUserData({ 
-        uid: user.uid, 
-        displayName: user.displayName 
-      });
-      showModal("👤 익명 로그인 완료", `새로운 익명 용사 프로필 (<strong>${user.displayName}</strong>)이 생성되었습니다!`);
-      updateUserUI();
-    }
-  });
+  if (btnGuestLogin) {
+    btnGuestLogin.addEventListener('click', async () => {
+      sound.playClick();
+      if (gameManager.user.uid && !gameManager.user.uid.startsWith('guest_local')) {
+        await logoutUser();
+        gameManager.user = {
+          uid: 'guest_local',
+          displayName: '상산초 용사',
+          gold: 50,
+          clears: 0,
+          bossKills: 0,
+          avatar: '🧙‍♂️'
+        };
+        showModal("🚪 로그아웃", "로그아웃 되었습니다. 익명 상태로 전환됩니다.");
+        updateUserUI();
+      } else {
+        btnGuestLogin.innerText = '생성 중...';
+        const user = await loginAnonymously();
+        gameManager.updateUserData({ 
+          uid: user.uid, 
+          displayName: user.displayName 
+        });
+        showModal("👤 익명 로그인 완료", `새로운 익명 용사 프로필 (<strong>${user.displayName}</strong>)이 생성되었습니다!`);
+        updateUserUI();
+      }
+    });
+  }
 
-  // 순차 미션 도전 버튼 이벤트 (1단계부터 6단계 순서대로 진행)
+  // 순차 미션 도전 버튼 이벤트
   if (btnStartSequential) {
     btnStartSequential.addEventListener('click', () => {
       sound.playClick();
@@ -165,63 +222,70 @@ async function initApp() {
     });
   });
 
-  // Render Mini-Game Selection Grid
   renderMinigameGrid();
 
   // Boss Card Listener
-  document.getElementById('card-boss-dungeon').addEventListener('click', () => {
-    sound.playClick();
-    try {
-      gameManager.startBossBattle(
-        (timeLeft, hp) => {
-          document.getElementById('boss-timer').innerText = timeLeft;
-          document.getElementById('boss-hp-current').innerText = hp;
-          document.getElementById('boss-hp-fill').style.width = `${hp}%`;
-        },
-        (result) => {
-          if (result.isVictory) {
-            showModal("🏆 보스 퇴치 성공!", `축하합니다! 대마왕 분수 드래곤을 무찔렀습니다.<br><strong>+300 Gold 획득!</strong>`, () => switchView('lobby'));
-          } else {
-            showModal("💀 보스전 실패!", `아쉽게도 보스 퇴치에 실패했습니다.<br>골드를 모아 다시 도전해보세요!`, () => switchView('lobby'));
+  const bossCard = document.getElementById('card-boss-dungeon');
+  if (bossCard) {
+    bossCard.addEventListener('click', () => {
+      sound.playClick();
+      try {
+        gameManager.startBossBattle(
+          (timeLeft, hp) => {
+            document.getElementById('boss-timer').innerText = timeLeft;
+            document.getElementById('boss-hp-current').innerText = hp;
+            document.getElementById('boss-hp-fill').style.width = `${hp}%`;
+          },
+          (result) => {
+            if (result.isVictory) {
+              showModal("🏆 보스 퇴치 성공!", `축하합니다! 대마왕 분수 드래곤을 무찔렀습니다.<br><strong>+300 Gold 획득!</strong>`, () => switchView('lobby'));
+            } else {
+              showModal("💀 보스전 실패!", `아쉽게도 보스 퇴치에 실패했습니다.<br>골드를 모아 다시 도전해보세요!`, () => switchView('lobby'));
+            }
           }
-        }
-      );
-      switchView('boss');
-      renderBossQuestion();
-    } catch (err) {
-      showModal("🪙 골드 부족", err.message);
-    }
-  });
+        );
+        switchView('boss');
+        renderBossQuestion();
+      } catch (err) {
+        showModal("🪙 골드 부족", err.message);
+      }
+    });
+  }
 
   // Hall of Fame Card Listener
-  document.getElementById('card-hall-of-fame').addEventListener('click', () => {
-    sound.playClick();
-    switchView('hall');
-    renderLeaderboard('gold');
-  });
+  const hallCard = document.getElementById('card-hall-of-fame');
+  if (hallCard) {
+    hallCard.addEventListener('click', () => {
+      sound.playClick();
+      switchView('hall');
+      renderLeaderboard('gold');
+    });
+  }
 
   // Hall of Fame Tabs
   const tabGold = document.getElementById('tab-gold-rank');
   const tabClears = document.getElementById('tab-clears-rank');
+  if (tabGold && tabClears) {
+    tabGold.addEventListener('click', () => {
+      sound.playClick();
+      tabGold.classList.add('active');
+      tabClears.classList.remove('active');
+      renderLeaderboard('gold');
+    });
 
-  tabGold.addEventListener('click', () => {
-    sound.playClick();
-    tabGold.classList.add('active');
-    tabClears.classList.remove('active');
-    renderLeaderboard('gold');
-  });
-
-  tabClears.addEventListener('click', () => {
-    sound.playClick();
-    tabClears.classList.add('active');
-    tabGold.classList.remove('active');
-    renderLeaderboard('clears');
-  });
+    tabClears.addEventListener('click', () => {
+      sound.playClick();
+      tabClears.classList.add('active');
+      tabGold.classList.remove('active');
+      renderLeaderboard('clears');
+    });
+  }
 }
 
 // Render Mini-Game Grid Cards
 function renderMinigameGrid() {
   const container = document.getElementById('minigame-grid-container');
+  if (!container) return;
   container.innerHTML = '';
 
   MINI_GAMES.forEach((game, idx) => {
@@ -262,21 +326,13 @@ function startSequentialMissionFlow(stageIdx) {
       document.getElementById('game-timer').innerText = timeLeft;
     },
     (stageResult) => {
-      // 🌟 25초 제한시간이 끝났을 때만 결과/종료 팝업창이 뜨며, 확인 버튼을 누르면 게임 플레이 화면이 종료되고 로비로 돌아갑니다.
-      showModal(
-        `⏰ ${stageResult.stageName} 결과`,
-        `25초 제한시간이 종료되었습니다!<br><br>획득 점수: <strong>${stageResult.score}점</strong><br>획득 골드: <strong>+${stageResult.earnedGold} G</strong><br><br>확인 버튼을 누르면 화면이 종료되고 메인 로비로 돌아갑니다.`,
-        () => {
-          switchView('lobby'); // 확인 버튼 클릭 시 플레이 화면 종료 ➔ 로비 복귀!
-        }
-      );
+      showMinigameEndModal(stageResult, stageIdx);
     }
   );
 
   renderMinigameQuestion();
 }
 
-// Render Question & Options for Minigame
 function renderMinigameQuestion() {
   if (gameManager.isStageFinished || gameManager.timeLeft <= 0) return;
 
@@ -307,7 +363,6 @@ function renderMinigameQuestion() {
   });
 }
 
-// Visual Fraction Bar Generator
 function renderVisualBars(visualData) {
   const barsBox = document.getElementById('visual-bars-box');
   if (!barsBox || !visualData) return;
@@ -336,7 +391,6 @@ function renderVisualBars(visualData) {
   barsBox.appendChild(bar2);
 }
 
-// Render Boss Question
 function renderBossQuestion() {
   if (gameManager.isBossFinished || gameManager.bossTimeLeft <= 0) return;
 
@@ -370,7 +424,6 @@ function renderBossQuestion() {
   });
 }
 
-// Render Leaderboard (Hall of Fame)
 async function renderLeaderboard(type = 'gold') {
   const listContainer = document.getElementById('rank-list-box');
   listContainer.innerHTML = '<div style="text-align:center; padding: 2rem;">🏆 명예의 전당 기록을 읽어오는 중...</div>';
@@ -405,5 +458,4 @@ async function renderLeaderboard(type = 'gold') {
   });
 }
 
-// Start application when DOM ready
 document.addEventListener('DOMContentLoaded', initApp);

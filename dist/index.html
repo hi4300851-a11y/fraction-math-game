@@ -206,7 +206,7 @@
 </head>
 <body>
   <div id="app">
-    <!-- Header (상단 프로필 및 구글 로그인/익명 로그인 원상복구) -->
+    <!-- Header (상단 프로필 및 구글 로그인/익명 로그인 버튼 항상 보임) -->
     <header class="top-bar">
       <div class="user-profile">
         <div class="avatar-badge" id="user-avatar">🧙‍♂️</div>
@@ -219,10 +219,10 @@
         <span class="gold-icon">🪙</span>
         <span id="user-gold-display">50</span> G
       </div>
-      <!-- 🌟 구글 로그인 & 익명 로그인 버튼 복원 🌟 -->
+      <!-- 🌟 Google 로그인 및 👤 익명 로그인 버튼 명시적 배치 🌟 -->
       <div class="auth-btns">
-        <button id="btn-google-login" class="btn-sm btn-google">Google 로그인</button>
-        <button id="btn-guest-login" class="btn-sm btn-guest">👤 익명 로그인</button>
+        <button id="btn-google-login" class="btn-sm btn-google" style="display: inline-block !important;">Google 로그인</button>
+        <button id="btn-guest-login" class="btn-sm btn-guest" style="display: inline-block !important;">👤 익명 로그인</button>
       </div>
     </header>
 
@@ -528,15 +528,17 @@
       if (userData.uid && !userData.uid.startsWith('guest_local')) {
         if (btnGoogle) btnGoogle.style.display = 'none';
         if (btnGuest) {
+          btnGuest.style.display = 'inline-block !important';
           btnGuest.innerText = '🚪 로그아웃';
           btnGuest.className = 'btn-sm btn-guest';
         }
       } else {
         if (btnGoogle) {
-          btnGoogle.style.display = 'inline-block';
+          btnGoogle.style.display = 'inline-block !important';
           btnGoogle.innerText = 'Google 로그인';
         }
         if (btnGuest) {
+          btnGuest.style.display = 'inline-block !important';
           btnGuest.innerText = '👤 익명 로그인';
           btnGuest.className = 'btn-sm btn-guest';
         }
