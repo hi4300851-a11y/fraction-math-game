@@ -76,7 +76,14 @@
       padding: 0.4rem 0.8rem; font-size: 0.95rem;
       border: none; border-radius: 12px; cursor: pointer;
     }
+    .btn-google {
+      background: #ea4335;
+      color: white;
+      box-shadow: 0 4px 10px rgba(234, 67, 53, 0.4);
+    }
+    .btn-google:hover { background: #d93025; }
     .btn-guest { background: rgba(255, 255, 255, 0.2); color: white; }
+    .btn-guest:hover { background: rgba(255, 255, 255, 0.3); }
     .view-screen { display: none; flex-direction: column; align-items: center; width: 100%; }
     .view-screen.active { display: flex; }
     .game-title { text-align: center; margin-bottom: 1.5rem; }
@@ -199,7 +206,7 @@
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
+    <!-- Header (상단 프로필 및 구글 로그인/익명 로그인 원상복구) -->
     <header class="top-bar">
       <div class="user-profile">
         <div class="avatar-badge" id="user-avatar">🧙‍♂️</div>
@@ -212,8 +219,10 @@
         <span class="gold-icon">🪙</span>
         <span id="user-gold-display">50</span> G
       </div>
+      <!-- 🌟 구글 로그인 & 익명 로그인 버튼 복원 🌟 -->
       <div class="auth-btns">
-        <button id="btn-guest-login" class="btn-sm btn-guest">👤 용사 프로필</button>
+        <button id="btn-google-login" class="btn-sm btn-google">Google 로그인</button>
+        <button id="btn-guest-login" class="btn-sm btn-guest">👤 익명 로그인</button>
       </div>
     </header>
 
@@ -302,7 +311,7 @@
       </div>
     </main>
 
-    <!-- 🌟 결과 팝업창 ('홈으로' 왼쪽, '다음으로' 오른쪽 순서 Swapped!) 🌟 -->
+    <!-- 🌟 결과 팝업창 ('홈으로' 왼쪽, '다음으로' 오른쪽 순서) 🌟 -->
     <div class="modal-overlay" id="game-modal">
       <div class="modal-card">
         <div class="modal-title" id="modal-title-text">⏰ 미션 결과</div>
@@ -317,7 +326,85 @@
 
   <script>
     // =========================================================
-    // 🌟 25초 타임아웃 멈춤 & 결과 팝업 & ['홈으로', '다음으로'] 컨트롤러 🌟
+    // 🌟 Firebase Auth & Google 로그인 & 익명 로그인 완벽 복원 🌟
+    // =========================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCeg7-gSm2eWWigr5wVnSIyLtaSfut09-Y",
+      authDomain: "th-math-4edfc.firebaseapp.com",
+      projectId: "th-math-4edfc",
+      storageBucket: "th-math-4edfc.appspot.com"
+    };
+
+    let firebaseAuth = null;
+
+    async function initFirebase() {
+      try {
+        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+        const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        
+        const app = initializeApp(firebaseConfig);
+        firebaseAuth = getAuth(app);
+
+        onAuthStateChanged(firebaseAuth, (user) => {
+          if (user) {
+            userData.uid = user.uid;
+            userData.displayName = user.displayName || (user.email ? user.email.split('@')[0] : '상산초 용사');
+          }
+          updateUserUI();
+        });
+      } catch (err) {
+        console.warn("Firebase Auth Init fallback:", err);
+      }
+    }
+
+    async function doGoogleLogin() {
+      try {
+        if (!firebaseAuth) await initFirebase();
+        const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(firebaseAuth, provider);
+        if (result.user) {
+          userData.uid = result.user.uid;
+          userData.displayName = result.user.displayName || '구글 용사';
+          updateUserUI();
+          alert(`🎉 Google 로그인 환영합니다, ${userData.displayName}님!`);
+        }
+      } catch (e) {
+        console.error("Google Login error:", e);
+        alert("Google 로그인 처리 중 오류가 발생했습니다: " + e.message);
+      }
+    }
+
+    async function doGuestAuth() {
+      if (userData.uid && !userData.uid.startsWith('guest_local')) {
+        if (firebaseAuth) {
+          try {
+            const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            await signOut(firebaseAuth);
+          } catch(e){}
+        }
+        userData.uid = null;
+        userData.displayName = '상산초 용사';
+        updateUserUI();
+        alert("로그아웃 되었습니다.");
+      } else {
+        try {
+          if (!firebaseAuth) await initFirebase();
+          const { signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+          const res = await signInAnonymously(firebaseAuth);
+          userData.uid = res.user.uid;
+          userData.displayName = '익명 용사_' + res.user.uid.substring(0, 4);
+        } catch (e) {
+          userData.uid = 'guest_local_' + Math.random().toString(36).substring(2, 7);
+          userData.displayName = '익명 용사_' + Math.floor(Math.random() * 8999 + 1000);
+        }
+        updateUserUI();
+        alert(`👤 익명 로그인 완료: ${userData.displayName}`);
+      }
+    }
+
+    // =========================================================
+    // 🌟 완전무결 25초 타임아웃 미니게임 및 로직 🌟
     // =========================================================
     const MINI_GAMES = [
       { id: 'proper_add', stageNum: 1, title: '미션 1: 진분수의 덧셈', icon: '➕', desc: '분모가 같은 진분수끼리 더해요!', color: '#4facfe' },
@@ -329,6 +416,7 @@
     ];
 
     let userData = {
+      uid: null,
       gold: 50,
       clears: 0,
       bossKills: 0,
@@ -428,10 +516,31 @@
       updateUserUI();
     }
 
+    // 🌟 사용자 로그인 및 상태 업데이트 UI 🌟
     function updateUserUI() {
       document.getElementById('user-name-display').innerText = userData.displayName;
       document.getElementById('user-stats-display').innerText = `클리어: ${userData.clears}회 | 보스: ${userData.bossKills}회`;
       document.getElementById('user-gold-display').innerText = userData.gold;
+
+      const btnGoogle = document.getElementById('btn-google-login');
+      const btnGuest = document.getElementById('btn-guest-login');
+
+      if (userData.uid && !userData.uid.startsWith('guest_local')) {
+        if (btnGoogle) btnGoogle.style.display = 'none';
+        if (btnGuest) {
+          btnGuest.innerText = '🚪 로그아웃';
+          btnGuest.className = 'btn-sm btn-guest';
+        }
+      } else {
+        if (btnGoogle) {
+          btnGoogle.style.display = 'inline-block';
+          btnGoogle.innerText = 'Google 로그인';
+        }
+        if (btnGuest) {
+          btnGuest.innerText = '👤 익명 로그인';
+          btnGuest.className = 'btn-sm btn-guest';
+        }
+      }
     }
 
     function clearTimer() {
@@ -538,7 +647,7 @@
       barsBox.appendChild(bar2);
     }
 
-    // 🌟🌟🌟 25초 종료 후 팝업 및 ['홈으로', '다음으로'] 버튼 위치 교체 적용 🌟🌟🌟
+    // 🌟 25초 종료 팝업 및 ['홈으로', '다음으로'] 버튼 클릭 바인딩 🌟
     function endMinigameAndShowModal() {
       isMinigameActive = false;
       clearTimer();
@@ -567,14 +676,12 @@
 
       modalEl.classList.add('active');
 
-      // 🌟 '홈으로' 버튼 클릭 시 ➔ 홈으로 이동!
       const handleHome = () => {
         modalEl.classList.remove('active');
         removeModalListeners();
         showView('view-lobby');
       };
 
-      // 🌟 '다음으로' 버튼 클릭 시 ➔ 다음 미니게임으로 이동!
       const handleNext = () => {
         modalEl.classList.remove('active');
         removeModalListeners();
@@ -595,7 +702,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Firebase 로그인 초기화
+      initFirebase();
       updateUserUI();
+
+      // 우측 상단 로그인 버튼 이벤트
+      const btnGoogle = document.getElementById('btn-google-login');
+      if (btnGoogle) {
+        btnGoogle.addEventListener('click', doGoogleLogin);
+      }
+
+      const btnGuest = document.getElementById('btn-guest-login');
+      if (btnGuest) {
+        btnGuest.addEventListener('click', doGuestAuth);
+      }
 
       const gridContainer = document.getElementById('minigame-grid-container');
       if (gridContainer) {
