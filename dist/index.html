@@ -109,23 +109,50 @@
     .banner-icon { font-size: 2.2rem; }
 
     /* ========================================================= */
-    /* 🏝️ 7개의 완전히 다른 형태를 가진 입체 아일랜드 월드 맵 🏝️ */
+    /* 🌊 리얼 해수면 파도 애니메이션 맵 배경 (Real Ocean Water) 🌊 */
     /* ========================================================= */
     .victoria-map-frame {
       width: 100%;
       height: 460px;
-      background: #0284c7;
-      background-image: 
-        radial-gradient(circle at 50% 50%, #38bdf8 0%, #0284c7 70%, #0369a1 100%),
-        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
-      background-size: 100% 100%, 32px 32px, 32px 32px;
-      border: 6px solid #92400e;
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 40%, #0c4a6e 80%, #075985 100%);
+      border: 7.5px solid #78350f;
       border-radius: 28px;
       padding: 0.8rem 1rem;
       position: relative;
-      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.5), 0 15px 35px rgba(0, 0, 0, 0.6);
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.6), 0 15px 35px rgba(0, 0, 0, 0.7);
       overflow: hidden;
+    }
+
+    /* 실시간으로 움직이는 바다 파도 코스틱스 레이어 (Ocean Wave Motion) */
+    .victoria-map-frame::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background-image: 
+        radial-gradient(ellipse at 50% 50%, rgba(56, 189, 248, 0.35) 0%, transparent 60%),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.12) 0px, rgba(255, 255, 255, 0.12) 12px, transparent 12px, transparent 24px),
+        repeating-linear-gradient(-45deg, rgba(14, 165, 233, 0.2) 0px, rgba(14, 165, 233, 0.2) 15px, transparent 15px, transparent 30px);
+      background-size: 100% 100%, 60px 60px, 80px 80px;
+      animation: realOceanWaves 16s linear infinite alternate;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes realOceanWaves {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-25px, 20px) scale(1.03); }
+      100% { transform: translate(25px, -15px) scale(1); }
+    }
+
+    .sea-compass-bg {
+      position: absolute;
+      bottom: 12px;
+      right: 18px;
+      font-size: 4.5rem;
+      opacity: 0.22;
+      pointer-events: none;
+      z-index: 2;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
     }
 
     .map-cloud {
@@ -135,7 +162,7 @@
       pointer-events: none;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
       animation: cloudFloat 10s infinite alternate ease-in-out;
-      z-index: 2;
+      z-index: 3;
     }
     .cloud-1 { top: -10px; left: -10px; }
     .cloud-2 { top: -15px; right: -10px; animation-delay: -3s; }
@@ -180,7 +207,7 @@
       position: relative;
     }
 
-    /* 🏝️ 7개의 완전히 서로 다른 3D 유기적 입체 섬 디자인 노드 🏝️ */
+    /* 🏝️ 7개의 서로 다른 입체 섬 디자인 노드 🏝️ */
     .real-island-shape {
       width: 96%;
       height: 96%;
@@ -200,7 +227,7 @@
       filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 22px rgba(253, 224, 71, 0.95));
     }
 
-    /* 🍄 섬 1 (버섯 마을): 둥글둥글 삼각형 모서리 포자 버섯섬 */
+    /* 🍄 섬 1 (버섯 마을) */
     .real-island-shape.theme-1 {
       background: radial-gradient(circle at 30% 30%, #a7f3d0 0%, #34d399 50%, #047857 100%);
       border-radius: 68% 32% 40% 60% / 55% 45% 55% 45%;
@@ -209,7 +236,7 @@
       box-shadow: inset 0 -10px 0 rgba(6, 95, 70, 0.7);
     }
 
-    /* 🌲 섬 2 (요정의 숲): 타원형으로 넓게 뻗은 요정 대륙 나뭇잎 섬 */
+    /* 🌲 섬 2 (요정의 숲) */
     .real-island-shape.theme-2 {
       background: radial-gradient(circle at 40% 40%, #bae6fd 0%, #38bdf8 50%, #0284c7 100%);
       border-radius: 30% 70% 70% 30% / 60% 40% 60% 40%;
@@ -218,7 +245,7 @@
       box-shadow: inset 0 -10px 0 rgba(12, 74, 110, 0.7);
     }
 
-    /* 🏜️ 섬 3 (전사의 고원): 깎아지른 각진 사막 바위 절벽 대륙 */
+    /* 🏜️ 섬 3 (전사의 고원) */
     .real-island-shape.theme-3 {
       background: radial-gradient(circle at 30% 30%, #fef08a 0%, #facc15 50%, #b45309 100%);
       border-radius: 40% 60% 30% 70% / 70% 30% 70% 30%;
@@ -227,7 +254,7 @@
       box-shadow: inset 0 -10px 0 rgba(120, 53, 15, 0.7);
     }
 
-    /* 🏗️ 섬 4 (도적의 도시): 톱날처럼 튀어나온 도적의 암석 요새 섬 */
+    /* 🏗️ 섬 4 (도적의 도시) */
     .real-island-shape.theme-4 {
       background: radial-gradient(circle at 40% 30%, #cbd5e1 0%, #64748b 50%, #1e293b 100%);
       border-radius: 75% 25% 65% 35% / 35% 65% 35% 65%;
@@ -236,7 +263,7 @@
       box-shadow: inset 0 -10px 0 rgba(15, 23, 42, 0.7);
     }
 
-    /* 🏖️ 섬 5 (해변 리조트): 초승달처럼 굽이치는 황금 해변 반도 섬 */
+    /* 🏖️ 섬 5 (해변 리조트) */
     .real-island-shape.theme-5 {
       background: radial-gradient(circle at 30% 40%, #ffedd5 0%, #fb923c 50%, #9a3412 100%);
       border-radius: 25% 75% 45% 55% / 65% 35% 65% 35%;
@@ -245,7 +272,7 @@
       box-shadow: inset 0 -10px 0 rgba(124, 45, 18, 0.7);
     }
 
-    /* ⚡ 섬 6 (시계탑): 높은 결정체 비송 솟아오른 결계 마법 섬 */
+    /* ⚡ 섬 6 (시계탑) */
     .real-island-shape.theme-6 {
       background: radial-gradient(circle at 30% 30%, #ddd6fe 0%, #8b5cf6 50%, #4c1d95 100%);
       border-radius: 50% 50% 75% 25% / 30% 70% 30% 70%;
@@ -254,7 +281,7 @@
       box-shadow: inset 0 -10px 0 rgba(30, 27, 75, 0.7);
     }
 
-    /* 🐲 중앙 최종 보스 (마왕의 둥지): 주름진 붉은 분화구 악마 화산 섬 */
+    /* 🐲 중앙 최종 보스 (마왕의 둥지) */
     .real-island-shape.theme-boss {
       background: radial-gradient(circle at 40% 40%, #fca5a5 0%, #ef4444 50%, #7f1d1d 100%);
       border-radius: 60% 40% 40% 60% / 40% 60% 60% 40%;
@@ -371,7 +398,7 @@
       </div>
     </header>
 
-    <!-- VIEW 1: 메인 로비 화면 (7개의 완전히 다른 입체 섬 월드 맵) -->
+    <!-- VIEW 1: 메인 로비 화면 (리얼 해수면 파도 애니메이션 월드 맵) -->
     <main id="view-lobby" class="view-screen active">
       <div class="game-title">
         <h1>⚔️ 진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
@@ -400,8 +427,9 @@
         </div>
       </div>
 
-      <!-- 🏝️ 7개의 서로 다른 섬 입체 월드 맵 🏝️ -->
+      <!-- 🌊 실제 해수면 파도 애니메이션 맵 배경 🌊 -->
       <div class="victoria-map-frame">
+        <div class="sea-compass-bg">🧩</div>
         <div class="map-cloud cloud-1">☁️</div>
         <div class="map-cloud cloud-2">☁️</div>
         <div class="map-cloud cloud-3">☁️</div>
@@ -412,7 +440,7 @@
         </div>
 
         <div class="compact-island-grid" id="compact-island-grid-box">
-          <!-- 스크립트로 7개의 완전히 다른 3D 섬 형태 노드가 배치됩니다 -->
+          <!-- 스크립트로 7개의 입체 섬 노드가 배치됩니다 -->
         </div>
       </div>
     </main>
@@ -558,7 +586,6 @@
       }
     }
 
-    // 🏝️ 7개의 서로 다른 섬 입체 위치 (3x3 Grid)
     const MINI_GAMES = [
       { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-1', gridPos: { col: 1, row: 1 } },
       { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-2', gridPos: { col: 2, row: 1 } },
@@ -854,7 +881,6 @@
       btnNext.onclick = handleNext;
     }
 
-    // 🏝️ 7개의 서로 다른 입체 섬 지형 렌더링 🏝️
     function renderCompactIslandGrid() {
       const container = document.getElementById('compact-island-grid-box');
       if (!container) return;
@@ -870,7 +896,6 @@
         }
       }
 
-      // 6개 스테이지 노드 배치
       MINI_GAMES.forEach((game, idx) => {
         const cell = container.querySelector(`.sector-cell[data-col="${game.gridPos.col}"][data-row="${game.gridPos.row}"]`);
         if (cell) {
@@ -889,7 +914,6 @@
         }
       });
 
-      // 중앙 셀 (2,2)에 보스 드래곤 둥지 입체 화산섬 배치
       const centerCell = container.querySelector(`.sector-cell[data-col="2"][data-row="2"]`);
       if (centerCell) {
         const bossNode = document.createElement('div');
@@ -921,7 +945,6 @@
         btnGuest.addEventListener('click', doGuestAuth);
       }
 
-      // 7개의 서로 다른 섬 입체 지형 맵 렌더링
       renderCompactIslandGrid();
 
       document.getElementById('btn-start-sequential-mission').addEventListener('click', () => {
