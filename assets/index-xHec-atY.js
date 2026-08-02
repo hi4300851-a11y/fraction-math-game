@@ -217,9 +217,9 @@
       barsBox.appendChild(bar2);
     }
 
-    // 🌟🌟🌟 25초 종료 후 팝업 및 '다음으로' / '홈으로' 2개 버튼 이벤트 🌟🌟🌟
+    // 🌟 25초 미니게임 종료 후 팝업 및 ['홈으로'(왼쪽), '다음으로'(오른쪽)] 2개 버튼 동적 바인딩 🌟
     function endMinigameAndShowModal() {
-      isMinigameActive = false; // 문제 멈춤!
+      isMinigameActive = false;
       clearTimer();
 
       userData.clears += 1;
@@ -232,7 +232,7 @@
       const titleEl = document.getElementById('modal-title-text');
       const bodyEl = document.getElementById('modal-body-text');
 
-      titleEl.innerText = `⏰ ${gameObj.title} 시간 종료!`;
+      titleEl.innerText = `⏰ ${gameObj.title} 완료!`;
       bodyEl.innerHTML = `25초 제한시간이 끝났습니다!<br><br>획득 점수: <strong>${currentScore}점</strong><br>획득 골드: <strong>+${earnedGoldSession} G</strong>`;
 
       let btnGroup = modalEl.querySelector('.modal-btn-group');
@@ -253,24 +253,24 @@
 
       const isLastStage = currentStageIdx >= MINI_GAMES.length - 1;
       btnGroup.innerHTML = `
-        <button class="btn-modal btn-next" id="dyn-btn-next" style="font-family:'Jua',sans-serif; flex:1; padding:0.85rem 1.2rem; font-size:1.2rem; border:none; border-radius:16px; cursor:pointer; background:linear-gradient(135deg, #f59e0b, #d97706); color:white;">${isLastStage ? '🏆 6단계 완수!' : '➡️ 다음으로'}</button>
         <button class="btn-modal btn-home" id="dyn-btn-home" style="font-family:'Jua',sans-serif; flex:1; padding:0.85rem 1.2rem; font-size:1.2rem; border:none; border-radius:16px; cursor:pointer; background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.3);">🏠 홈으로</button>
+        <button class="btn-modal btn-next" id="dyn-btn-next" style="font-family:'Jua',sans-serif; flex:1; padding:0.85rem 1.2rem; font-size:1.2rem; border:none; border-radius:16px; cursor:pointer; background:linear-gradient(135deg, #f59e0b, #d97706); color:white;">${isLastStage ? '🏆 6단계 완수!' : '➡️ 다음으로'}</button>
       `;
 
       modalEl.classList.add('active');
+
+      document.getElementById('dyn-btn-home').onclick = () => {
+        modalEl.classList.remove('active');
+        showView('view-lobby');
+      };
 
       document.getElementById('dyn-btn-next').onclick = () => {
         modalEl.classList.remove('active');
         if (isLastStage) {
           showView('view-lobby');
         } else {
-          startMinigame(currentStageIdx + 1); // ➡️ 다음 미니게임으로 이동!
+          startMinigame(currentStageIdx + 1);
         }
-      };
-
-      document.getElementById('dyn-btn-home').onclick = () => {
-        modalEl.classList.remove('active');
-        showView('view-lobby'); // 🏠 홈(처음 화면)으로 이동!
       };
     }
 

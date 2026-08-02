@@ -156,7 +156,7 @@
     .boss-hp-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.9rem; font-weight: bold; }
     .hall-container { width: 100%; background: var(--card-bg); backdrop-filter: blur(12px); border: 2px solid var(--card-border); border-radius: 24px; padding: 1.5rem; }
 
-    /* 결과 팝업 모달 & 2개 버튼 그룹 스타일 */
+    /* 결과 팝업 모달 & ('홈으로' 왼쪽, '다음으로' 오른쪽) 버튼 그룹 스타일 */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center;
@@ -184,14 +184,14 @@
       transition: transform 0.15s ease;
     }
     .btn-modal:hover { transform: scale(1.05); }
-    .btn-next {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: white;
-    }
     .btn-home {
       background: rgba(255, 255, 255, 0.2);
       color: white;
       border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .btn-next {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
     }
     .floating-text { position: fixed; font-family: 'Jua', sans-serif; font-size: 1.6rem; font-weight: bold; pointer-events: none; animation: floatUp 1s forwards ease-out; z-index: 9999; }
     @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(1.3); } }
@@ -217,7 +217,7 @@
       </div>
     </header>
 
-    <!-- VIEW 1: 메인 로비 화면 (처음 화면 / 홈) -->
+    <!-- VIEW 1: 메인 로비 화면 (홈 화면) -->
     <main id="view-lobby" class="view-screen active">
       <div class="game-title">
         <h1>⚔️ 진천상산초 4학년 1반<br>분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
@@ -302,14 +302,14 @@
       </div>
     </main>
 
-    <!-- 🌟 결과 팝업창 (2개 버튼: '다음으로' & '홈으로') 🌟 -->
+    <!-- 🌟 결과 팝업창 ('홈으로' 왼쪽, '다음으로' 오른쪽 순서 Swapped!) 🌟 -->
     <div class="modal-overlay" id="game-modal">
       <div class="modal-card">
         <div class="modal-title" id="modal-title-text">⏰ 미션 결과</div>
         <p id="modal-body-text" style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 1rem;"></p>
         <div class="modal-btn-group">
-          <button class="btn-modal btn-next" id="modal-btn-next">➡️ 다음으로</button>
           <button class="btn-modal btn-home" id="modal-btn-home">🏠 홈으로</button>
+          <button class="btn-modal btn-next" id="modal-btn-next">➡️ 다음으로</button>
         </div>
       </div>
     </div>
@@ -317,7 +317,7 @@
 
   <script>
     // =========================================================
-    // 🌟 완전무결 25초 타임아웃 종료 팝업 및 '다음으로'/'홈으로' 컨트롤러 🌟
+    // 🌟 25초 타임아웃 멈춤 & 결과 팝업 & ['홈으로', '다음으로'] 컨트롤러 🌟
     // =========================================================
     const MINI_GAMES = [
       { id: 'proper_add', stageNum: 1, title: '미션 1: 진분수의 덧셈', icon: '➕', desc: '분모가 같은 진분수끼리 더해요!', color: '#4facfe' },
@@ -339,7 +339,7 @@
     let timeLeft = 25;
     let currentScore = 0;
     let earnedGoldSession = 0;
-    let isMinigameActive = false; // ★ 미니게임 활성화 상태 플래그
+    let isMinigameActive = false;
     let currentQuestion = null;
     let currentStageIdx = 0;
 
@@ -441,7 +441,6 @@
       }
     }
 
-    // 🌟🌟🌟 미니게임 시작 🌟🌟🌟
     function startMinigame(stageIdx) {
       clearTimer();
       currentStageIdx = stageIdx;
@@ -453,7 +452,7 @@
       timeLeft = 25;
       currentScore = 0;
       earnedGoldSession = 0;
-      isMinigameActive = true; // 게임 가동
+      isMinigameActive = true;
 
       document.getElementById('game-timer').innerText = timeLeft;
       showView('view-minigame');
@@ -469,7 +468,6 @@
         timeLeft--;
         document.getElementById('game-timer').innerText = Math.max(0, timeLeft);
 
-        // 🌟 25초 종료 시 타이머 멈추고 결과 팝업 호출 🌟
         if (timeLeft <= 0) {
           endMinigameAndShowModal();
         }
@@ -540,9 +538,9 @@
       barsBox.appendChild(bar2);
     }
 
-    // 🌟🌟🌟 25초 종료 후 팝업 및 '다음으로' / '홈으로' 버튼 이벤트 🌟🌟🌟
+    // 🌟🌟🌟 25초 종료 후 팝업 및 ['홈으로', '다음으로'] 버튼 위치 교체 적용 🌟🌟🌟
     function endMinigameAndShowModal() {
-      isMinigameActive = false; // ★ 문제 출제 및 클릭 완전 마비!
+      isMinigameActive = false;
       clearTimer();
 
       userData.clears += 1;
@@ -554,8 +552,8 @@
       const modalEl = document.getElementById('game-modal');
       const titleEl = document.getElementById('modal-title-text');
       const bodyEl = document.getElementById('modal-body-text');
-      const btnNext = document.getElementById('modal-btn-next');
       const btnHome = document.getElementById('modal-btn-home');
+      const btnNext = document.getElementById('modal-btn-next');
 
       titleEl.innerText = `⏰ ${gameObj.title} 시간 종료!`;
       bodyEl.innerHTML = `25초 제한시간이 끝났습니다!<br><br>획득 점수: <strong>${currentScore}점</strong><br>획득 골드: <strong>+${earnedGoldSession} G</strong>`;
@@ -569,54 +567,55 @@
 
       modalEl.classList.add('active');
 
-      // 🌟 '다음으로' 버튼 클릭 시
+      // 🌟 '홈으로' 버튼 클릭 시 ➔ 홈으로 이동!
+      const handleHome = () => {
+        modalEl.classList.remove('active');
+        removeModalListeners();
+        showView('view-lobby');
+      };
+
+      // 🌟 '다음으로' 버튼 클릭 시 ➔ 다음 미니게임으로 이동!
       const handleNext = () => {
         modalEl.classList.remove('active');
         removeModalListeners();
         if (isLastStage) {
-          showView('view-lobby'); // 마지막 미션이면 로비로
+          showView('view-lobby');
         } else {
-          startMinigame(currentStageIdx + 1); // 다음 미니게임으로 이동!
+          startMinigame(currentStageIdx + 1);
         }
       };
 
-      // 🌟 '홈으로' 버튼 클릭 시
-      const handleHome = () => {
-        modalEl.classList.remove('active');
-        removeModalListeners();
-        showView('view-lobby'); // 메인 홈 화면으로 이동!
-      };
-
       function removeModalListeners() {
-        btnNext.removeEventListener('click', handleNext);
         btnHome.removeEventListener('click', handleHome);
+        btnNext.removeEventListener('click', handleNext);
       }
 
-      btnNext.addEventListener('click', handleNext);
-      btnHome.addEventListener('click', handleHome);
+      btnHome.onclick = handleHome;
+      btnNext.onclick = handleNext;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       updateUserUI();
 
       const gridContainer = document.getElementById('minigame-grid-container');
-      gridContainer.innerHTML = '';
-
-      MINI_GAMES.forEach((game, idx) => {
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        card.innerHTML = `
-          <div class="stage-badge">단계 ${game.stageNum}</div>
-          <div class="game-card-icon">${game.icon}</div>
-          <div class="game-card-title">${game.title}</div>
-          <div class="game-card-desc">${game.desc}</div>
-          <div class="game-card-tag" style="background:${game.color}44; border: 1px solid ${game.color};">25초 미션 ${idx + 1}</div>
-        `;
-        card.addEventListener('click', () => {
-          startMinigame(idx);
+      if (gridContainer) {
+        gridContainer.innerHTML = '';
+        MINI_GAMES.forEach((game, idx) => {
+          const card = document.createElement('div');
+          card.className = 'game-card';
+          card.innerHTML = `
+            <div class="stage-badge">단계 ${game.stageNum}</div>
+            <div class="game-card-icon">${game.icon}</div>
+            <div class="game-card-title">${game.title}</div>
+            <div class="game-card-desc">${game.desc}</div>
+            <div class="game-card-tag" style="background:${game.color}44; border: 1px solid ${game.color};">25초 미션 ${idx + 1}</div>
+          `;
+          card.addEventListener('click', () => {
+            startMinigame(idx);
+          });
+          gridContainer.appendChild(card);
         });
-        gridContainer.appendChild(card);
-      });
+      }
 
       document.getElementById('btn-start-sequential-mission').addEventListener('click', () => {
         startMinigame(0);
