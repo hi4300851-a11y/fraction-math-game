@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!!</title>
-  <meta name="description" content="진천상산초등학교 4학년 1반 분수 용사들을 위한 분수의 덧셈과 뺄셈 미니게임 및 보스전 학습 앱!" />
+  <meta name="description" content="진천상산초등학교 4학년 1반 분수 용사들을 위한 6단계 순차 미션 & 보스전 학습 앱!" />
   <link rel="stylesheet" href="./src/style.css" />
   <!-- Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
@@ -36,7 +36,16 @@
     <main id="view-lobby" class="view-screen active">
       <div class="game-title">
         <h1>⚔️ 진천상산초 4학년 1반<br>분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
-        <p>미니게임을 풀어 골드를 얻고, 100 골드로 분수 보스를 퇴치하자!</p>
+        <p>미션 1부터 6까지 순서대로 클리어하고, 100 골드로 분수 보스를 퇴치하자!</p>
+      </div>
+
+      <!-- Main Sequential Start Button -->
+      <div id="btn-start-sequential-mission" class="banner-card start-mission-banner">
+        <div class="banner-icon">🎯</div>
+        <div class="banner-text">
+          <h3 style="font-size: 1.6rem; color: #fde047;">🚀 6단계 미션 순서대로 도전하기!</h3>
+          <p>미션 1(진분수 덧셈) ➔ 미션 6(자연수-가분수 뺄셈)까지 연속 도전!</p>
+        </div>
       </div>
 
       <!-- Boss Dungeon & Hall of Fame Banners -->
@@ -58,8 +67,8 @@
         </div>
       </div>
 
-      <!-- 6 Mini-Game Selection Grid -->
-      <h2 style="margin-bottom: 1rem; width: 100%; text-align: left;">⚔️ 6가지 미니게임 선택</h2>
+      <!-- 6 Mini-Game Sequential Stages List -->
+      <h2 style="margin-bottom: 1rem; width: 100%; text-align: left;">📜 미션 수행 순서 (1단계 ~ 6단계)</h2>
       <div class="minigame-grid" id="minigame-grid-container">
         <!-- Rendered dynamically via JS -->
       </div>
@@ -69,8 +78,13 @@
     <main id="view-minigame" class="view-screen">
       <div class="game-header">
         <button class="btn-back btn-to-lobby">⬅️ 로비로 돌아가기</button>
-        <h2 id="minigame-title">진분수의 덧셈</h2>
+        <h2 id="minigame-title">미션 1: 진분수의 덧셈</h2>
         <div class="timer-box">⏱️ <span id="game-timer">25</span>s</div>
+      </div>
+
+      <!-- Mission Stage Progress Indicator -->
+      <div class="mission-step-indicator" id="mission-step-indicator">
+        <!-- Step 1 of 6 rendered via JS -->
       </div>
 
       <div class="question-card">

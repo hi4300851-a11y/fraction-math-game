@@ -4,12 +4,12 @@ import { triggerConfetti, triggerVictoryConfetti, showFloatingText } from './eff
 import { saveUserData, getLeaderboard } from './firebase.js';
 
 export const MINI_GAMES = [
-  { id: 'proper_add', title: '진분수의 덧셈', icon: '➕', desc: '분모가 같은 진분수끼리 더해요!', color: '#4facfe' },
-  { id: 'improper_add', title: '가분수의 덧셈', icon: '🚀', desc: '1보다 큰 가분수들을 신나게 더해요!', color: '#00f2fe' },
-  { id: 'natural_improper_add', title: '자연수+가분수 덧셈', icon: '👑', desc: '자연수와 가분수를 변환해서 더해요!', color: '#43e97b' },
-  { id: 'proper_sub', title: '진분수의 뺄셈', icon: '➖', desc: '분모는 그대로, 분자끼리 빼요!', color: '#ff0844' },
-  { id: 'improper_sub', title: '가분수의 뺄셈', icon: '🔥', desc: '가분수의 뺄셈을 정복해요!', color: '#ffb199' },
-  { id: 'natural_improper_sub', title: '자연수-가분수 뺄셈', icon: '⚡', desc: '자연수를 분수로 바꾸어 빼요!', color: '#f6d365' }
+  { id: 'proper_add', stageNum: 1, title: '미션 1: 진분수의 덧셈', icon: '➕', desc: '분모가 같은 진분수끼리 더해요!', color: '#4facfe' },
+  { id: 'improper_add', stageNum: 2, title: '미션 2: 가분수의 덧셈', icon: '🚀', desc: '1보다 큰 가분수들을 신나게 더해요!', color: '#00f2fe' },
+  { id: 'natural_improper_add', stageNum: 3, title: '미션 3: 자연수+가분수 덧셈', icon: '👑', desc: '자연수와 가분수를 변환해서 더해요!', color: '#43e97b' },
+  { id: 'proper_sub', stageNum: 4, title: '미션 4: 진분수의 뺄셈', icon: '➖', desc: '분모는 그대로, 분자끼리 빼요!', color: '#ff0844' },
+  { id: 'improper_sub', stageNum: 5, title: '미션 5: 가분수의 뺄셈', icon: '🔥', desc: '가분수의 뺄셈을 정복해요!', color: '#ffb199' },
+  { id: 'natural_improper_sub', stageNum: 6, title: '미션 6: 자연수-가분수 뺄셈', icon: '⚡', desc: '자연수를 분수로 바꾸어 빼요!', color: '#f6d365' }
 ];
 
 export class GameManager {
@@ -25,6 +25,7 @@ export class GameManager {
 
     this.activeMode = 'lobby';
     this.currentMinigame = null;
+    this.currentStageIndex = 0; // 0 ~ 5 순차 미션 진행
 
     // 미니게임 상태
     this.timer = null;
@@ -65,8 +66,10 @@ export class GameManager {
     this.updateUserData({ gold: this.user.gold });
   }
 
-  startMinigame(gameId, onTick, onFinish) {
-    this.currentMinigame = MINI_GAMES.find(g => g.id === gameId);
+  // 순서대로 미션 도전 시작 (stageIndex: 0 ~ 5)
+  startSequentialMission(stageIndex = 0, onTick, onStageFinish) {
+    this.currentStageIndex = stageIndex;
+    this.currentMinigame = MINI_GAMES[this.currentStageIndex];
     this.activeMode = 'minigame';
     this.timeLeft = 25;
     this.score = 0;
@@ -81,7 +84,7 @@ export class GameManager {
 
       if (this.timeLeft <= 0) {
         clearInterval(this.timer);
-        this.finishMinigame(onFinish);
+        this.finishStage(onStageFinish);
       }
     }, 1000);
   }
@@ -91,11 +94,9 @@ export class GameManager {
     this.currentQuestion = generateQuestion(this.currentMinigame.id);
   }
 
-  // 6가지 미니게임 전수 정답/오답 처리 (무조건 1회 클릭 시 무조건 다음 문제 생성!)
+  // 1회 클릭 시 무조건 다음 문제 전진
   checkAnswer(selectedAnsObj, eventTargetEl) {
     const currAns = this.currentQuestion.correctAnswer;
-    
-    // 정답 판단: 분자/분모 일치 OR 텍스트 일치
     const isCorrect = (selectedAnsObj.num === currAns.num && selectedAnsObj.den === currAns.den) ||
                       (String(selectedAnsObj.improperText).trim() === String(currAns.improperText).trim()) ||
                       (String(selectedAnsObj.mixedText).trim() === String(currAns.mixedText).trim());
@@ -123,9 +124,28 @@ export class GameManager {
       showFloatingText(`❌ 땡!`, rect.left, rect.top - 20, '#ef4444');
     }
 
-    // 🌟 핵심: 맞추든 틀리든 절대로 재도전 기회 없이 무조건 다음 문제로 즉시 교체!
     this.nextQuestion();
     return { correct: isCorrect };
+  }
+
+  finishStage(onStageFinish) {
+    this.user.clears += 1;
+    this.updateUserData({ clears: this.user.clears });
+    sound.playFanfare();
+    triggerVictoryConfetti();
+
+    const isAllMissionsComplete = this.currentStageIndex >= MINI_GAMES.length - 1;
+
+    if (onStageFinish) {
+      onStageFinish({
+        stageNum: this.currentStageIndex + 1,
+        stageName: this.currentMinigame.title,
+        score: this.score,
+        earnedGold: this.earnedGoldInSession,
+        isAllMissionsComplete,
+        nextStageIndex: this.currentStageIndex + 1
+      });
+    }
   }
 
   startBossBattle(onTick, onFinish) {
@@ -181,7 +201,6 @@ export class GameManager {
       showFloatingText(`🛡️ 오답! (방어 성공)`, rect.left, rect.top - 30, '#888888');
     }
 
-    // 보스전도 맞추든 틀리든 즉시 다음 문제 전진
     if (this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
       clearInterval(this.timer);
       setTimeout(() => this.finishBossBattle(), 300);
