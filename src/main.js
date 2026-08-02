@@ -262,22 +262,12 @@ function startSequentialMissionFlow(stageIdx) {
       document.getElementById('game-timer').innerText = timeLeft;
     },
     (stageResult) => {
-      if (stageResult.isAllMissionsComplete) {
-        // 모든 6단계 완수!
-        gameManager.addGold(100); // 6단계 완수 추가 보너스 골드!
-        showModal(
-          "🎉 6단계 모든 미션 최종 완료!!",
-          `축하합니다! 진천상산초 분수 용사님!<br>미션 1부터 6까지 모든 분수 미션을 완수했습니다!<br><strong>+100 G 완성 보너스 획득!</strong><br><br>이제 100 Gold로 대마왕 보스전에 도전하세요!`,
-          () => switchView('lobby')
-        );
-      } else {
-        // 다음 미션 단계로 순차 계속 진행!
-        showModal(
-          `🎉 ${stageResult.stageName} 완료!`,
-          `수고하셨습니다!<br>획득 골드: <strong>+${stageResult.earnedGold} G</strong><br><br>확인을 누르면 바로 다음 미션(<strong>${MINI_GAMES[stageResult.nextStageIndex].title}</strong>)으로 이어서 진행됩니다!`,
-          () => startSequentialMissionFlow(stageResult.nextStageIndex)
-        );
-      }
+      // 🌟 시간이 끝나면 미션 종료 팝업이 뜨고, 확인 버튼 클릭 시 게임 화면 종료(로비 이동)
+      showModal(
+        `⏰ ${stageResult.stageName} 시간 종료!`,
+        `25초 제한시간이 끝났습니다!<br>획득 점수: <strong>${stageResult.score}점</strong><br>획득 골드: <strong>+${stageResult.earnedGold} G</strong><br><br>확인 버튼을 누르면 화면이 종료되어 로비로 돌아갑니다.`,
+        () => switchView('lobby') // 확인 버튼을 누르면 미니게임 화면 종료 및 로비 이동!
+      );
     }
   );
 
