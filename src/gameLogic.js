@@ -16,19 +16,19 @@ export class GameManager {
   constructor() {
     this.user = {
       uid: 'guest_local',
-      displayName: '분수 용사',
-      gold: 50, // 초기 증정 골드
+      displayName: '상산초 용사',
+      gold: 50,
       clears: 0,
       bossKills: 0,
       avatar: '🧙‍♂️'
     };
 
-    this.activeMode = 'lobby'; // lobby, minigame, boss, hallOfFame
+    this.activeMode = 'lobby';
     this.currentMinigame = null;
 
     // 미니게임 상태
     this.timer = null;
-    this.timeLeft = 25; // 25초 미니게임
+    this.timeLeft = 25;
     this.score = 0;
     this.combo = 0;
     this.earnedGoldInSession = 0;
@@ -40,7 +40,7 @@ export class GameManager {
     this.bossQuestionIndex = 0;
     this.bossTotalQuestions = 10;
     this.bossCorrectCount = 0;
-    this.bossTimeLeft = 60; // 보스전 60초
+    this.bossTimeLeft = 60;
   }
 
   loadLocalData() {
@@ -60,13 +60,11 @@ export class GameManager {
     saveUserData(this.user.uid, this.user);
   }
 
-  // 골드 변경
   addGold(amount) {
     this.user.gold = Math.max(0, this.user.gold + amount);
     this.updateUserData({ gold: this.user.gold });
   }
 
-  // 미니게임 시작
   startMinigame(gameId, onTick, onFinish) {
     this.currentMinigame = MINI_GAMES.find(g => g.id === gameId);
     this.activeMode = 'minigame';
@@ -92,10 +90,12 @@ export class GameManager {
     this.currentQuestion = generateQuestion(this.currentMinigame.id);
   }
 
-  // 정답 검증 (미니게임)
+  // 정답/오답 검증 (틀리면 재도전 없이 즉시 다음 문제로 전진!)
   checkAnswer(selectedAnsObj, eventTargetEl) {
     const isCorrect = selectedAnsObj.improperText === this.currentQuestion.correctAnswer.improperText ||
                       selectedAnsObj.mixedText === this.currentQuestion.correctAnswer.mixedText;
+
+    const rect = eventTargetEl ? eventTargetEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
 
     if (isCorrect) {
       sound.playCorrect();
@@ -111,40 +111,25 @@ export class GameManager {
       triggerConfetti();
       sound.playCoin();
 
-      const rect = eventTargetEl ? eventTargetEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
       showFloatingText(`+${earned} G! (${this.combo} 콤보!)`, rect.left, rect.top - 20, '#ffd700');
-
       this.nextQuestion();
       return { correct: true, combo: this.combo, earned };
     } else {
       sound.playWrong();
       this.combo = 0;
+      showFloatingText(`❌ 땡!`, rect.left, rect.top - 20, '#ef4444');
+      
+      this.nextQuestion(); // 오답 시 기회 없이 즉시 다음 문제로 전환!
       return { correct: false, correctAnswer: this.currentQuestion.correctAnswer };
     }
   }
 
-  finishMinigame(onFinish) {
-    this.user.clears += 1;
-    this.updateUserData({ clears: this.user.clears });
-    sound.playFanfare();
-    triggerVictoryConfetti();
-    if (onFinish) {
-      onFinish({
-        score: this.score,
-        earnedGold: this.earnedGoldInSession,
-        clears: this.user.clears
-      });
-    }
-  }
-
-  // 보스전 시작 (입장료 100G)
   startBossBattle(onTick, onFinish) {
     const BOSS_ENTRY_FEE = 100;
     if (this.user.gold < BOSS_ENTRY_FEE) {
       throw new Error(`보스 전에 도전하려면 최소 ${BOSS_ENTRY_FEE} 골드가 필요합니다! (현재 ${this.user.gold} G)`);
     }
 
-    // 입장료 차감
     this.addGold(-BOSS_ENTRY_FEE);
 
     this.activeMode = 'boss';
@@ -152,7 +137,7 @@ export class GameManager {
     this.bossMaxHp = 100;
     this.bossQuestionIndex = 0;
     this.bossCorrectCount = 0;
-    this.bossTimeLeft = 60; // 60초 보스전
+    this.bossTimeLeft = 60;
 
     this.nextBossQuestion();
 
@@ -161,7 +146,7 @@ export class GameManager {
       this.bossTimeLeft--;
       if (onTick) onTick(this.bossTimeLeft, this.bossHp);
 
-      if (this.bossTimeLeft <= 0 || this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
+      if (this.bossTimeLeft <= 0 || this.bossHp <= 0 || this.bossQuestionIndex > this.bossTotalQuestions) {
         clearInterval(this.timer);
         this.finishBossBattle(onFinish);
       }
@@ -177,13 +162,14 @@ export class GameManager {
     const isCorrect = selectedAnsObj.improperText === this.currentQuestion.correctAnswer.improperText ||
                       selectedAnsObj.mixedText === this.currentQuestion.correctAnswer.mixedText;
 
+    const rect = eventTargetEl ? eventTargetEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
+
     if (isCorrect) {
       sound.playHit();
       this.bossCorrectCount++;
-      const damage = 10; // 10문제 = 100 HP
+      const damage = 10;
       this.bossHp = Math.max(0, this.bossHp - damage);
 
-      const rect = eventTargetEl ? eventTargetEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
       showFloatingText(`💥 BOOM! -10 HP`, rect.left, rect.top - 30, '#ff4757');
 
       if (this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
@@ -195,12 +181,13 @@ export class GameManager {
       return { correct: true, bossHp: this.bossHp };
     } else {
       sound.playWrong();
-      showFloatingText(`🛡️ 보스 방어 성공!`, window.innerWidth/2, window.innerHeight/3, '#888');
+      showFloatingText(`🛡️ 오답! (방어 성공)`, rect.left, rect.top - 30, '#888888');
+
       if (this.bossQuestionIndex >= this.bossTotalQuestions) {
         clearInterval(this.timer);
         setTimeout(() => this.finishBossBattle(), 300);
       } else {
-        this.nextBossQuestion();
+        this.nextBossQuestion(); // 보스전 오답 시에도 바로 다음 문제로 넘어가기!
       }
       return { correct: false, bossHp: this.bossHp };
     }

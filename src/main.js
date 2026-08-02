@@ -49,7 +49,7 @@ function switchView(viewName) {
 function updateUserUI() {
   const u = gameManager.user;
   userAvatarEl.innerText = u.avatar || '🧙‍♂️';
-  userNameEl.innerText = u.displayName || '분수 용사';
+  userNameEl.innerText = u.displayName || '상산초 용사';
   userStatsEl.innerText = `클리어: ${u.clears || 0}회 | 보스: ${u.bossKills || 0}회`;
   userGoldEl.innerText = u.gold || 0;
 
@@ -115,7 +115,7 @@ async function initApp() {
       console.warn("Google Auth exception:", e);
       showModal(
         "ℹ️ 구글 로그인 안내", 
-        `현재 Firebase API 키가 아직 설정되지 않아 로컬 익명 모드로 작동합니다.<br><br>‘익명 로그인’을 클릭하시면 언제든 게임 기록이 즉시 저장됩니다!`
+        `현재 Firebase API 키가 설정되어 익명 모드 및 회원 모드가 가동됩니다!`
       );
     } finally {
       updateUserUI();
@@ -130,7 +130,7 @@ async function initApp() {
       await logoutUser();
       gameManager.user = {
         uid: 'guest_local',
-        displayName: '분수 용사',
+        displayName: '상산초 용사',
         gold: 50,
         clears: 0,
         bossKills: 0,
@@ -279,13 +279,9 @@ function renderMinigameQuestion() {
     btn.innerHTML = optObj.displayHtml;
 
     btn.addEventListener('click', (e) => {
-      const res = gameManager.checkAnswer(optObj, e.currentTarget);
-      if (res.correct) {
-        renderMinigameQuestion();
-      } else {
-        btn.style.borderColor = '#ef4444';
-        btn.style.background = 'rgba(239, 68, 68, 0.3)';
-      }
+      gameManager.checkAnswer(optObj, e.currentTarget);
+      // 정답이든 오답이든 재도전 기회 없이 즉시 다음 문제로 화면 갱신!
+      renderMinigameQuestion();
     });
 
     optionsGrid.appendChild(btn);
