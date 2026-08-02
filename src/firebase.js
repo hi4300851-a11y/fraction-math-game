@@ -10,16 +10,19 @@ export function ensureFirebaseInit() {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
+    // 1. Vite Environment Variables
+    const apiKey = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_API_KEY) || "AIzaSyCeg7-gSm2eWWigr5wVnSIyLtaSfut09-Y";
+    const authDomain = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_AUTH_DOMAIN) || "th-math-4edfc.firebaseapp.com";
+    const projectId = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_PROJECT_ID) || "th-math-4edfc";
+
     const firebaseConfig = {
-      apiKey: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_API_KEY) || "",
-      authDomain: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_AUTH_DOMAIN) || "",
-      projectId: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_PROJECT_ID) || "",
-      storageBucket: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_STORAGE_BUCKET) || "",
-      messagingSenderId: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID) || "",
-      appId: (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FIREBASE_APP_ID) || ""
+      apiKey,
+      authDomain,
+      projectId,
+      storageBucket: `${projectId}.appspot.com`
     };
 
-    if (firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.apiKey !== "your_api_key_here") {
+    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
       try {
         const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
         const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -29,7 +32,7 @@ export function ensureFirebaseInit() {
         auth = getAuth(app);
         db = getFirestore(app);
         isFirebaseActive = true;
-        console.log("🔥 Firebase SDK initialized successfully!");
+        console.log("🔥 Firebase (th-math-4edfc) initialized successfully!");
       } catch (e) {
         console.warn("Firebase SDK init fallback to LocalStorage mode:", e);
       }
