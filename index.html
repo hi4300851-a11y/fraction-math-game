@@ -5,12 +5,595 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!!</title>
   <meta name="description" content="진천상산초등학교 4학년 1반 분수 용사들을 위한 6단계 순차 미션 & 보스전 학습 앱!" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gamja+Flower&display=swap" rel="stylesheet">
   <!-- Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
-  <script type="module" crossorigin src="/dist/assets/index-5iaLx4Rb.js"></script>
-  <link rel="stylesheet" crossorigin href="/dist/assets/index-D38Oqr2f.css">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+      --card-bg: rgba(255, 255, 255, 0.12);
+      --card-border: rgba(255, 255, 255, 0.22);
+      --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --text-main: #ffffff;
+      --gold-glow: 0 0 15px rgba(251, 191, 36, 0.6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      font-family: 'Jua', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+    #app {
+      width: 100%;
+      max-width: 900px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      padding: 0.8rem 1.5rem;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+    }
+    .user-profile { display: flex; align-items: center; gap: 0.75rem; }
+    .avatar-badge {
+      font-size: 2.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; border: 2px solid #ffd700;
+    }
+    .user-name { font-size: 1.2rem; font-weight: bold; }
+    .user-stats { font-size: 0.9rem; color: #cbd5e1; }
+    .user-gold-box {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      padding: 0.5rem 1.2rem; border-radius: 30px;
+      font-size: 1.3rem; font-weight: bold;
+      box-shadow: var(--gold-glow);
+    }
+    .auth-btns { display: flex; gap: 0.5rem; }
+    .btn-sm {
+      font-family: 'Jua', sans-serif;
+      padding: 0.4rem 0.8rem; font-size: 0.95rem;
+      border: none; border-radius: 12px; cursor: pointer;
+    }
+    .btn-google { background: #ea4335; color: white; }
+    .btn-guest { background: rgba(255, 255, 255, 0.2); color: white; }
+    .view-screen { display: none; flex-direction: column; align-items: center; width: 100%; }
+    .view-screen.active { display: flex; }
+    .game-title { text-align: center; margin-bottom: 1.5rem; }
+    .game-title h1 {
+      font-size: 2.2rem;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(to right, #fde047, #f97316);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .start-mission-banner {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.8), rgba(99, 102, 241, 0.9));
+      border: 3px solid #fde047; border-radius: 20px;
+      padding: 1.2rem 1.8rem; display: flex; align-items: center; gap: 1.2rem;
+      cursor: pointer; margin-bottom: 1.2rem;
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+    }
+    .action-banner { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; margin-bottom: 1.5rem; }
+    .banner-card {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      backdrop-filter: blur(10px); border-radius: 20px; padding: 1.2rem;
+      display: flex; align-items: center; gap: 1rem; cursor: pointer;
+    }
+    .banner-card.boss-card { background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.5)); border-color: #f87171; }
+    .banner-card.hall-card { background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(180, 83, 9, 0.5)); border-color: #fbbf24; }
+    .banner-icon { font-size: 2.8rem; }
+    .minigame-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; width: 100%; }
+    .game-card {
+      background: var(--card-bg); backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: 18px;
+      padding: 1.2rem; display: flex; flex-direction: column; align-items: center;
+      text-align: center; cursor: pointer; position: relative;
+    }
+    .stage-badge { position: absolute; top: 10px; left: 10px; background: #f59e0b; color: black; font-weight: bold; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
+    .mission-step-indicator {
+      width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--card-border);
+      padding: 0.6rem 1rem; border-radius: 15px; margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #fde047;
+    }
+    .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 1rem; }
+    .btn-back { font-family: 'Jua', sans-serif; background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 14px; cursor: pointer; }
+    .timer-box { background: rgba(239, 68, 68, 0.3); border: 2px solid #f87171; padding: 0.5rem 1.5rem; border-radius: 30px; font-size: 1.5rem; font-weight: bold; }
+    .question-card {
+      background: rgba(0, 0, 0, 0.35); border: 2px solid var(--card-border);
+      backdrop-filter: blur(15px); width: 100%; border-radius: 24px;
+      padding: 2rem; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; margin-bottom: 1.5rem; min-height: 200px;
+    }
+    .math-expr { display: flex; align-items: center; gap: 1.2rem; font-size: 2.5rem; }
+    .fraction-box { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; padding: 0 0.4rem; }
+    .fraction-box .num { border-bottom: 3px solid #ffffff; padding: 0 0.3rem 0.2rem 0.3rem; line-height: 1; }
+    .fraction-box .den { padding: 0.2rem 0.3rem 0 0.3rem; line-height: 1; }
+    .mixed-fraction { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .whole-num, .whole-only { font-size: 2.8rem; font-weight: bold; color: #ffffff !important; }
+    .question-card .whole-num, .question-card .whole-only { color: #fbbf24 !important; }
+    .operator { font-size: 2.5rem; color: #38bdf8; font-weight: bold; }
+    .visual-hint-container { width: 100%; margin-top: 1.5rem; background: rgba(255, 255, 255, 0.08); padding: 0.8rem; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .hint-label { font-size: 0.9rem; color: #94a3b8; }
+    .fraction-bars-wrap { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 400px; }
+    .fraction-bar { display: flex; width: 100%; height: 24px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.3); }
+    .bar-segment { flex: 1; border-right: 1px solid rgba(0, 0, 0, 0.3); background: rgba(255, 255, 255, 0.15); }
+    .bar-segment.filled-1 { background: #38bdf8; }
+    .bar-segment.filled-2 { background: #f43f5e; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; }
+    .option-btn {
+      font-family: 'Jua', sans-serif; background: var(--card-bg);
+      backdrop-filter: blur(10px); border: 2px solid var(--card-border);
+      border-radius: 18px; padding: 1.2rem; font-size: 1.8rem;
+      color: #ffffff !important; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .option-btn * { color: #ffffff !important; border-color: #ffffff !important; }
+    .boss-card-container { width: 100%; background: linear-gradient(135deg, rgba(153, 27, 27, 0.6), rgba(69, 10, 10, 0.8)); border: 3px solid #ef4444; border-radius: 24px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; margin-bottom: 1.5rem; }
+    .boss-avatar { font-size: 4rem; }
+    .boss-hp-bar-bg { width: 100%; max-width: 500px; height: 25px; background: rgba(0, 0, 0, 0.5); border-radius: 15px; overflow: hidden; border: 2px solid #f87171; position: relative; margin-top: 0.8rem; }
+    .boss-hp-bar-fill { height: 100%; width: 100%; background: linear-gradient(to right, #f43f5e, #ef4444); transition: width 0.3s ease; }
+    .boss-hp-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.9rem; font-weight: bold; }
+    .hall-container { width: 100%; background: var(--card-bg); backdrop-filter: blur(12px); border: 2px solid var(--card-border); border-radius: 24px; padding: 1.5rem; }
+    .rank-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .rank-item { display: flex; align-items: center; justify-content: space-between; background: rgba(0, 0, 0, 0.25); padding: 0.8rem 1.2rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .rank-number { font-size: 1.4rem; width: 40px; font-weight: bold; }
+    .rank-number.top1 { color: #ffd700; }
+    .rank-number.top2 { color: #c0c0c0; }
+    .rank-number.top3 { color: #cd7f32; }
+    .rank-user { display: flex; align-items: center; gap: 0.8rem; flex: 1; }
+    .rank-score { font-size: 1.2rem; font-weight: bold; color: #fbbf24; }
+
+    /* 결과 팝업 모달 스타일 */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8); display: none; align-items: center; justify-content: center;
+      z-index: 99999;
+    }
+    .modal-overlay.active { display: flex !important; }
+    .modal-card { background: #1e1b4b; border: 3px solid #fde047; border-radius: 24px; padding: 2rem; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); }
+    .modal-title { font-size: 2rem; margin-bottom: 1rem; color: #fbbf24; }
+    .btn-primary { font-family: 'Jua', sans-serif; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 0.9rem 2.2rem; font-size: 1.3rem; border-radius: 18px; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.5); }
+    .btn-primary:hover { transform: scale(1.05); }
+    .floating-text { position: fixed; font-family: 'Jua', sans-serif; font-size: 1.6rem; font-weight: bold; pointer-events: none; animation: floatUp 1s forwards ease-out; z-index: 9999; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(1.3); } }
+  </style>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <!-- Header -->
+    <header class="top-bar">
+      <div class="user-profile">
+        <div class="avatar-badge" id="user-avatar">🧙‍♂️</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">상산초 용사</div>
+          <div class="user-stats" id="user-stats-display">클리어: 0회 | 보스: 0회</div>
+        </div>
+      </div>
+      <div class="user-gold-box">
+        <span class="gold-icon">🪙</span>
+        <span id="user-gold-display">50</span> G
+      </div>
+      <div class="auth-btns">
+        <button id="btn-guest-login" class="btn-sm btn-guest">👤 용사 프로필</button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: 메인 로비 화면 (처음 화면) -->
+    <main id="view-lobby" class="view-screen active">
+      <div class="game-title">
+        <h1>⚔️ 진천상산초 4학년 1반<br>분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
+        <p>25초 동안 분수 문제를 풀고, 골드를 모아 보스를 퇴치하자!</p>
+      </div>
+      <div id="btn-start-sequential-mission" class="banner-card start-mission-banner">
+        <div class="banner-icon">🎯</div>
+        <div class="banner-text">
+          <h3 style="font-size: 1.6rem; color: #fde047;">🚀 6단계 미션 도전하기!</h3>
+          <p>미션 1(진분수 덧셈) ➔ 미션 6(자연수-가분수 뺄셈) 도전!</p>
+        </div>
+      </div>
+      <div class="action-banner">
+        <div id="card-boss-dungeon" class="banner-card boss-card">
+          <div class="banner-icon">👹</div>
+          <div class="banner-text">
+            <h3>보스 던전 도전!</h3>
+            <p>100 Gold 필요 (10문제 배틀)</p>
+          </div>
+        </div>
+        <div id="card-hall-of-fame" class="banner-card hall-card">
+          <div class="banner-icon">🏆</div>
+          <div class="banner-text">
+            <h3>명예의 전당</h3>
+            <p>골드 & 클리어 Top 10 랭킹</p>
+          </div>
+        </div>
+      </div>
+      <h2 style="margin-bottom: 1rem; width: 100%; text-align: left;">📜 미니게임 미션 목록 (1단계 ~ 6단계)</h2>
+      <div class="minigame-grid" id="minigame-grid-container"></div>
+    </main>
+
+    <!-- VIEW 2: 미니게임 화면 (25초 제한시간) -->
+    <main id="view-minigame" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 처음 화면으로 돌아가기</button>
+        <h2 id="minigame-title">미션 1: 진분수의 덧셈</h2>
+        <div class="timer-box">⏱️ <span id="game-timer">25</span>s</div>
+      </div>
+      <div class="mission-step-indicator" id="mission-step-indicator"></div>
+      <div class="question-card">
+        <div id="question-render-box"></div>
+        <div class="visual-hint-container">
+          <span class="hint-label">💡 분수 시각 가이드 (분모 쪼개기)</span>
+          <div class="fraction-bars-wrap" id="visual-bars-box"></div>
+        </div>
+      </div>
+      <div class="options-grid" id="options-grid-box"></div>
+    </main>
+
+    <!-- VIEW 3: 보스전 화면 -->
+    <main id="view-boss" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 처음 화면으로 돌아가기</button>
+        <h2>👹 분수 드래곤 보스전!</h2>
+        <div class="timer-box">⏱️ <span id="boss-timer">60</span>s</div>
+      </div>
+      <div class="boss-card-container">
+        <div class="boss-avatar">🐲</div>
+        <h3>대마왕 분수 드래곤</h3>
+        <div class="boss-hp-bar-bg">
+          <div class="boss-hp-bar-fill" id="boss-hp-fill"></div>
+          <div class="boss-hp-text"><span id="boss-hp-current">100</span> / 100 HP</div>
+        </div>
+        <p style="margin-top: 0.5rem; font-size: 0.95rem;" id="boss-progress-text">문제 1 / 10</p>
+      </div>
+      <div class="question-card">
+        <div id="boss-question-render-box"></div>
+      </div>
+      <div class="options-grid" id="boss-options-grid-box"></div>
+    </main>
+
+    <!-- VIEW 4: 명예의 전당 화면 -->
+    <main id="view-hall" class="view-screen">
+      <div class="game-header">
+        <button class="btn-back btn-to-lobby">⬅️ 처음 화면으로 돌아가기</button>
+        <h2>🏆 4학년 1반 명예의 전당 Top 10</h2>
+        <div></div>
+      </div>
+      <div class="hall-container">
+        <div class="rank-list" id="rank-list-box"></div>
+      </div>
+    </main>
+
+    <!-- 🌟 결과 팝업창 (25초 종료 시 팝업 / 확인 클릭 시 처음 화면으로 돌아가기) 🌟 -->
+    <div class="modal-overlay" id="game-modal">
+      <div class="modal-card">
+        <div class="modal-title" id="modal-title-text">⏰ 미션 결과</div>
+        <p id="modal-body-text" style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 1rem;"></p>
+        <button class="btn-primary" id="modal-close-btn">확인 (처음 화면으로 돌아가기)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // 🌟 완전무결 게임 데이터 및 25초 타임아웃 & 결과 팝업 컨트롤러 🌟
+    // =========================================================
+    const MINI_GAMES = [
+      { id: 'proper_add', stageNum: 1, title: '미션 1: 진분수의 덧셈', icon: '➕', desc: '분모가 같은 진분수끼리 더해요!', color: '#4facfe' },
+      { id: 'improper_add', stageNum: 2, title: '미션 2: 가분수의 덧셈', icon: '🚀', desc: '1보다 큰 가분수들을 신나게 더해요!', color: '#00f2fe' },
+      { id: 'natural_improper_add', stageNum: 3, title: '미션 3: 자연수+가분수 덧셈', icon: '👑', desc: '자연수와 가분수를 변환해서 더해요!', color: '#43e97b' },
+      { id: 'proper_sub', stageNum: 4, title: '미션 4: 진분수의 뺄셈', icon: '➖', desc: '분모는 그대로, 분자끼리 빼요!', color: '#ff0844' },
+      { id: 'improper_sub', stageNum: 5, title: '미션 5: 가분수의 뺄셈', icon: '🔥', desc: '가분수의 뺄셈을 정복해요!', color: '#ffb199' },
+      { id: 'natural_improper_sub', stageNum: 6, title: '미션 6: 자연수-가분수 뺄셈', icon: '⚡', desc: '자연수를 분수로 바꾸어 빼요!', color: '#f6d365' }
+    ];
+
+    let userData = {
+      gold: 50,
+      clears: 0,
+      bossKills: 0,
+      displayName: '상산초 용사'
+    };
+
+    // 전역 타이머 및 미니게임 진행 변수
+    let minigameTimer = null;
+    let timeLeft = 25;
+    let currentScore = 0;
+    let earnedGoldSession = 0;
+    let isMinigameActive = false; // ★ 미니게임 진행중 상태 플래그
+    let currentQuestion = null;
+    let currentStageIdx = 0;
+
+    // 헬퍼 기능
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function createFractionHtml(num, den) {
+      return `<div class="fraction-box"><span class="num">${num}</span><span class="den">${den}</span></div>`;
+    }
+
+    function createMixedFractionHtml(whole, num, den) {
+      if (whole === 0) return createFractionHtml(num, den);
+      return `<div class="mixed-fraction"><span class="whole">${whole}</span>${createFractionHtml(num, den)}</div>`;
+    }
+
+    function formatAnswer(num, den) {
+      const whole = Math.floor(num / den);
+      const rem = num % den;
+      return {
+        num, den, whole, rem,
+        improperText: rem === 0 ? `${whole}` : `${num}/${den}`,
+        mixedText: whole > 0 ? (rem === 0 ? `${whole}` : `${whole}와 ${rem}/${den}`) : `${num}/${den}`,
+        displayHtml: rem === 0 ? `<span class="whole-only">${whole}</span>` : (whole > 0 ? createMixedFractionHtml(whole, rem, den) : createFractionHtml(num, den))
+      };
+    }
+
+    function generateOptions(correctAnswer, den) {
+      const options = [correctAnswer];
+      const used = new Set([correctAnswer.improperText]);
+      while (options.length < 4) {
+        let fakeNum = correctAnswer.num + getRandomInt(-4, 4);
+        if (fakeNum <= 0 || fakeNum === correctAnswer.num) {
+          fakeNum = correctAnswer.num + (options.length + 1);
+        }
+        const fakeAns = formatAnswer(fakeNum, den);
+        if (!used.has(fakeAns.improperText)) {
+          used.add(fakeAns.improperText);
+          options.push(fakeAns);
+        }
+      }
+      return options.sort(() => Math.random() - 0.5);
+    }
+
+    function generateQuestion(type) {
+      const den = getRandomInt(3, 9);
+      let num1, num2, op, questionHtml, visualData, correctNum;
+
+      switch (type) {
+        case 'proper_add':
+          num1 = getRandomInt(1, den - 1); num2 = getRandomInt(1, den - 1); op = '+'; correctNum = num1 + num2;
+          questionHtml = `<div class="math-expr">${createFractionHtml(num1, den)}<span class="operator">+</span>${createFractionHtml(num2, den)}</div>`;
+          visualData = { den, n1: num1, n2: num2, op }; break;
+        case 'improper_add':
+          num1 = getRandomInt(den, den * 2); num2 = getRandomInt(den, den * 2); op = '+'; correctNum = num1 + num2;
+          questionHtml = `<div class="math-expr">${createFractionHtml(num1, den)}<span class="operator">+</span>${createFractionHtml(num2, den)}</div>`;
+          visualData = { den, n1: num1, n2: num2, op }; break;
+        case 'natural_improper_add':
+          const nAdd = getRandomInt(1, 3); num2 = getRandomInt(den + 1, den * 2); num1 = nAdd * den; op = '+'; correctNum = num1 + num2;
+          questionHtml = `<div class="math-expr"><span class="whole-num">${nAdd}</span><span class="operator">+</span>${createFractionHtml(num2, den)}</div>`;
+          visualData = { den, n1: num1, n2: num2, op }; break;
+        case 'proper_sub':
+          num1 = getRandomInt(2, den - 1); num2 = getRandomInt(1, num1 - 1); op = '-'; correctNum = num1 - num2;
+          questionHtml = `<div class="math-expr">${createFractionHtml(num1, den)}<span class="operator">-</span>${createFractionHtml(num2, den)}</div>`;
+          visualData = { den, n1: num1, n2: num2, op }; break;
+        case 'improper_sub':
+          num2 = getRandomInt(den, den * 2 - 2); num1 = num2 + getRandomInt(1, den); op = '-'; correctNum = num1 - num2;
+          questionHtml = `<div class="math-expr">${createFractionHtml(num1, den)}<span class="operator">-</span>${createFractionHtml(num2, den)}</div>`;
+          visualData = { den, n1: num1, n2: num2, op }; break;
+        case 'natural_improper_sub':
+          const nSub = getRandomInt(2, 4); num1 = nSub * den; num2 = getRandomInt(den + 1, num1 - 1); op = '-'; correctNum = num1 - num2;
+          questionHtml = `<div class="math-expr"><span class="whole-num">${nSub}</span><span class="operator">-</span>${createFractionHtml(num2, den)}</div>`;
+          visualData = { den, n1: num1, n2: num2, op }; break;
+        case 'boss_random': default:
+          const types = ['proper_add', 'improper_add', 'natural_improper_add', 'proper_sub', 'improper_sub', 'natural_improper_sub'];
+          return generateQuestion(types[Math.floor(Math.random() * types.length)]);
+      }
+
+      const correctAnswer = formatAnswer(correctNum, den);
+      return { type, questionHtml, correctAnswer, options: generateOptions(correctAnswer, den), visualData };
+    }
+
+    // UI 뷰 관리 기능
+    function showView(viewId) {
+      document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      updateUserUI();
+    }
+
+    function updateUserUI() {
+      document.getElementById('user-name-display').innerText = userData.displayName;
+      document.getElementById('user-stats-display').innerText = `클리어: ${userData.clears}회 | 보스: ${userData.bossKills}회`;
+      document.getElementById('user-gold-display').innerText = userData.gold;
+    }
+
+    function clearTimer() {
+      if (minigameTimer) {
+        clearInterval(minigameTimer);
+        minigameTimer = null;
+      }
+    }
+
+    // 🌟🌟🌟 미니게임 시작 (25초 타이머 작동) 🌟🌟🌟
+    function startMinigame(stageIdx) {
+      clearTimer();
+      currentStageIdx = stageIdx;
+      const gameObj = MINI_GAMES[stageIdx];
+
+      document.getElementById('minigame-title').innerText = gameObj.title;
+      document.getElementById('mission-step-indicator').innerHTML = `<span>🎯 미션: <strong>${gameObj.title}</strong></span>`;
+
+      timeLeft = 25;
+      currentScore = 0;
+      earnedGoldSession = 0;
+      isMinigameActive = true; // ★ 게임 활성화!
+
+      document.getElementById('game-timer').innerText = timeLeft;
+      showView('view-minigame');
+
+      nextMinigameQuestion();
+
+      // 1초 주기로 25초 타이머 감소
+      minigameTimer = setInterval(() => {
+        if (!isMinigameActive) {
+          clearTimer();
+          return;
+        }
+
+        timeLeft--;
+        document.getElementById('game-timer').innerText = Math.max(0, timeLeft);
+
+        // 🌟🌟🌟 25초가 종료되는 순간!! 타이머를 즉시 멈추고 문제 출제 차단 후 팝업 출력! 🌟🌟🌟
+        if (timeLeft <= 0) {
+          endMinigameAndShowModal();
+        }
+      }, 1000);
+    }
+
+    function nextMinigameQuestion() {
+      if (!isMinigameActive || timeLeft <= 0) return;
+
+      const gameObj = MINI_GAMES[currentStageIdx];
+      currentQuestion = generateQuestion(gameObj.id);
+
+      const renderBox = document.getElementById('question-render-box');
+      renderBox.innerHTML = currentQuestion.questionHtml;
+
+      renderVisualBars(currentQuestion.visualData);
+
+      const optionsGrid = document.getElementById('options-grid-box');
+      optionsGrid.innerHTML = '';
+
+      currentQuestion.options.forEach(optObj => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = optObj.displayHtml;
+
+        btn.addEventListener('click', (e) => {
+          // 🌟 25초 시간이 끝났으면 클릭을 완전 무효 처리 🌟
+          if (!isMinigameActive || timeLeft <= 0) return;
+
+          const isCorrect = (optObj.num === currentQuestion.correctAnswer.num && optObj.den === currentQuestion.correctAnswer.den) ||
+                            (String(optObj.improperText).trim() === String(currentQuestion.correctAnswer.improperText).trim());
+
+          if (isCorrect) {
+            currentScore += 100;
+            earnedGoldSession += 10;
+            userData.gold += 10;
+            try { window.confetti({ particleCount: 50, spread: 60 }); } catch(err) {}
+          }
+
+          updateUserUI();
+
+          // 시간이 아직 남아있다면 바로 다음 문제 진행!
+          if (isMinigameActive && timeLeft > 0) {
+            nextMinigameQuestion();
+          }
+        });
+
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    function renderVisualBars(visualData) {
+      const barsBox = document.getElementById('visual-bars-box');
+      if (!barsBox || !visualData) return;
+      barsBox.innerHTML = '';
+      const den = visualData.den; const n1 = visualData.n1 || 1; const n2 = visualData.n2 || 1;
+
+      const bar1 = document.createElement('div'); bar1.className = 'fraction-bar';
+      for (let i = 0; i < den; i++) {
+        const seg = document.createElement('div'); seg.className = `bar-segment ${i < n1 ? 'filled-1' : ''}`;
+        bar1.appendChild(seg);
+      }
+      barsBox.appendChild(bar1);
+
+      const bar2 = document.createElement('div'); bar2.className = 'fraction-bar';
+      for (let i = 0; i < den; i++) {
+        const seg = document.createElement('div'); seg.className = `bar-segment ${i < n2 ? 'filled-2' : ''}`;
+        bar2.appendChild(seg);
+      }
+      barsBox.appendChild(bar2);
+    }
+
+    // 🌟🌟🌟 25초 종료 처리 및 팝업 생성 🌟🌟🌟
+    function endMinigameAndShowModal() {
+      isMinigameActive = false; // ★ 문제 출제 및 클릭 완전 마비!
+      clearTimer();
+
+      userData.clears += 1;
+      updateUserUI();
+
+      try { window.confetti({ particleCount: 100, spread: 80 }); } catch(e){}
+
+      const gameObj = MINI_GAMES[currentStageIdx];
+      const modalEl = document.getElementById('game-modal');
+      const titleEl = document.getElementById('modal-title-text');
+      const bodyEl = document.getElementById('modal-body-text');
+      const closeBtn = document.getElementById('modal-close-btn');
+
+      titleEl.innerText = `⏰ ${gameObj.title} 시간 종료!`;
+      bodyEl.innerHTML = `25초 제한시간이 끝났습니다!<br><br>획득 점수: <strong>${currentScore}점</strong><br>획득 골드: <strong>+${earnedGoldSession} G</strong><br><br>확인 버튼을 누르면 처음 화면으로 돌아갑니다.`;
+
+      modalEl.classList.add('active');
+
+      // 🌟🌟🌟 팝업의 [확인] 버튼 클릭 시 처음 화면(메인 로비)으로 100% 이동 🌟🌟🌟
+      const handleConfirm = () => {
+        modalEl.classList.remove('active');
+        closeBtn.removeEventListener('click', handleConfirm);
+        showView('view-lobby'); // 처음 화면(로비)으로 복귀!
+      };
+
+      closeBtn.addEventListener('click', handleConfirm);
+    }
+
+    // 초기화 및 그리드 렌더링
+    document.addEventListener('DOMContentLoaded', () => {
+      updateUserUI();
+
+      const gridContainer = document.getElementById('minigame-grid-container');
+      gridContainer.innerHTML = '';
+
+      MINI_GAMES.forEach((game, idx) => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.innerHTML = `
+          <div class="stage-badge">단계 ${game.stageNum}</div>
+          <div class="game-card-icon">${game.icon}</div>
+          <div class="game-card-title">${game.title}</div>
+          <div class="game-card-desc">${game.desc}</div>
+          <div class="game-card-tag" style="background:${game.color}44; border: 1px solid ${game.color};">25초 미션 ${idx + 1}</div>
+        `;
+        card.addEventListener('click', () => {
+          startMinigame(idx);
+        });
+        gridContainer.appendChild(card);
+      });
+
+      // 대형 미션 시작 버튼
+      document.getElementById('btn-start-sequential-mission').addEventListener('click', () => {
+        startMinigame(0);
+      });
+
+      // 처음 화면으로 돌아가기 버튼
+      document.querySelectorAll('.btn-to-lobby').forEach(btn => {
+        btn.addEventListener('click', () => {
+          isMinigameActive = false;
+          clearTimer();
+          showView('view-lobby');
+        });
+      });
+    });
+  </script>
 </body>
 </html>
