@@ -34,7 +34,7 @@ export class GameManager {
     this.combo = 0;
     this.earnedGoldInSession = 0;
     this.currentQuestion = null;
-    this.isStageFinished = false; // ★ 이미 게임이 끝났는지 여부 상태 플래그
+    this.isStageFinished = false;
 
     // 콜백 저장 변수
     this._onStageFinishCallback = null;
@@ -73,9 +73,11 @@ export class GameManager {
   }
 
   // =============================================
-  // 순차 미션 (미니게임 6단계)
+  // 미니게임 25초 시한성 실행 (Stage 1 ~ 6)
   // =============================================
   startSequentialMission(stageIndex = 0, onTick, onStageFinish) {
+    this.stopTimer(); // 기존 타이머 완벽 제거
+
     this.currentStageIndex = stageIndex;
     this.currentMinigame = MINI_GAMES[this.currentStageIndex];
     this.activeMode = 'minigame';
@@ -83,20 +85,24 @@ export class GameManager {
     this.score = 0;
     this.combo = 0;
     this.earnedGoldInSession = 0;
-    this.isStageFinished = false; // ★ 미션 시작 시 종료 플래그 초기화!
+    this.isStageFinished = false;
 
     this._onStageFinishCallback = onStageFinish;
 
     this.nextQuestion();
 
-    if (this.timer) clearInterval(this.timer);
+    // 1초 주기로 차감
     this.timer = setInterval(() => {
-      if (this.isStageFinished) return;
+      if (this.isStageFinished) {
+        this.stopTimer();
+        return;
+      }
 
-      this.timeLeft--;
+      this.timeLeft = Math.max(0, this.timeLeft - 1);
+      
       if (onTick) onTick(this.timeLeft);
 
-      // 시간이 0 이하가 되는 순간 타이머 정지 & 미션 완료 처리!
+      // 0초 이하가 되는 순간 타이머 멈추고 팝업 호출!
       if (this.timeLeft <= 0) {
         this.stopTimer();
         this.finishStage();
@@ -105,13 +111,12 @@ export class GameManager {
   }
 
   nextQuestion() {
-    if (!this.currentMinigame) return;
+    if (!this.currentMinigame || this.isStageFinished || this.timeLeft <= 0) return;
     this.currentQuestion = generateQuestion(this.currentMinigame.id);
   }
 
-  // 답안 체크 (시간이 끝났으면 아무것도 안 함!)
+  // 답안 체크 (시간 지났으면 클릭 철저히 방어!)
   checkAnswer(selectedAnsObj, eventTargetEl) {
-    // ★ 이미 시간이 지났거나 미션이 종료된 경우 클릭 차단!
     if (this.isStageFinished || this.timeLeft <= 0) {
       return { correct: false, finished: true };
     }
@@ -144,13 +149,16 @@ export class GameManager {
       showFloatingText(`❌ 땡!`, rect.left, rect.top - 20, '#ef4444');
     }
 
-    this.nextQuestion();
-    return { correct: isCorrect, finished: false };
+    if (this.timeLeft > 0 && !this.isStageFinished) {
+      this.nextQuestion();
+    }
+    
+    return { correct: isCorrect, finished: this.isStageFinished || this.timeLeft <= 0 };
   }
 
-  // 미션 종료 처리
+  // 시간종료 및 결과 팝업 트리거
   finishStage() {
-    if (this.isStageFinished) return; // 중복 호출 방지
+    if (this.isStageFinished) return;
     this.isStageFinished = true;
     this.stopTimer();
 
@@ -178,6 +186,7 @@ export class GameManager {
       throw new Error(`보스 전에 도전하려면 최소 ${BOSS_ENTRY_FEE} 골드가 필요합니다! (현재 ${this.user.gold} G)`);
     }
 
+    this.stopTimer();
     this.addGold(-BOSS_ENTRY_FEE);
 
     this.activeMode = 'boss';
@@ -192,11 +201,13 @@ export class GameManager {
 
     this.nextBossQuestion();
 
-    if (this.timer) clearInterval(this.timer);
     this.timer = setInterval(() => {
-      if (this.isBossFinished) return;
+      if (this.isBossFinished) {
+        this.stopTimer();
+        return;
+      }
 
-      this.bossTimeLeft--;
+      this.bossTimeLeft = Math.max(0, this.bossTimeLeft - 1);
       if (onTick) onTick(this.bossTimeLeft, this.bossHp);
 
       if (this.bossTimeLeft <= 0 || this.bossHp <= 0 || this.bossQuestionIndex > this.bossTotalQuestions) {
@@ -207,6 +218,7 @@ export class GameManager {
   }
 
   nextBossQuestion() {
+    if (this.isBossFinished || this.bossTimeLeft <= 0) return;
     this.bossQuestionIndex++;
     this.currentQuestion = generateQuestion('boss_random');
   }
@@ -236,11 +248,11 @@ export class GameManager {
 
     if (this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
       this.stopTimer();
-      setTimeout(() => this.finishBossBattle(), 300);
+      setTimeout(() => this.finishBossBattle(), 200);
     } else {
       this.nextBossQuestion();
     }
-    return { correct: isCorrect, bossHp: this.bossHp, finished: false };
+    return { correct: isCorrect, bossHp: this.bossHp, finished: this.isBossFinished || this.bossTimeLeft <= 0 };
   }
 
   finishBossBattle() {
