@@ -25,7 +25,7 @@ export class GameManager {
 
     this.activeMode = 'lobby';
     this.currentMinigame = null;
-    this.currentStageIndex = 0; // 0 ~ 5 순차 미션 진행
+    this.currentStageIndex = 0;
 
     // 미니게임 상태
     this.timer = null;
@@ -34,6 +34,10 @@ export class GameManager {
     this.combo = 0;
     this.earnedGoldInSession = 0;
     this.currentQuestion = null;
+
+    // ★ 콜백을 인스턴스에 저장하여 어디서든 확실하게 호출 가능하게 합니다
+    this._onStageFinishCallback = null;
+    this._onBossFinishCallback = null;
 
     // 보스전 상태
     this.bossMaxHp = 100;
@@ -66,7 +70,9 @@ export class GameManager {
     this.updateUserData({ gold: this.user.gold });
   }
 
-  // 순서대로 미션 도전 시작 (stageIndex: 0 ~ 5)
+  // =============================================
+  // 순차 미션 (미니게임 6단계)
+  // =============================================
   startSequentialMission(stageIndex = 0, onTick, onStageFinish) {
     this.currentStageIndex = stageIndex;
     this.currentMinigame = MINI_GAMES[this.currentStageIndex];
@@ -75,6 +81,10 @@ export class GameManager {
     this.score = 0;
     this.combo = 0;
     this.earnedGoldInSession = 0;
+
+    // ★ 콜백을 인스턴스 변수에 저장 (finishStage에서 확실히 접근 가능)
+    this._onStageFinishCallback = onStageFinish;
+
     this.nextQuestion();
 
     if (this.timer) clearInterval(this.timer);
@@ -84,7 +94,8 @@ export class GameManager {
 
       if (this.timeLeft <= 0) {
         clearInterval(this.timer);
-        this.finishStage(onStageFinish);
+        this.timer = null;
+        this.finishStage();
       }
     }, 1000);
   }
@@ -94,7 +105,7 @@ export class GameManager {
     this.currentQuestion = generateQuestion(this.currentMinigame.id);
   }
 
-  // 1회 클릭 시 무조건 다음 문제 전진
+  // 1회 클릭 시 무조건 다음 문제로 전진 (팝업 없이 즉시)
   checkAnswer(selectedAnsObj, eventTargetEl) {
     const currAns = this.currentQuestion.correctAnswer;
     const isCorrect = (selectedAnsObj.num === currAns.num && selectedAnsObj.den === currAns.den) ||
@@ -128,26 +139,27 @@ export class GameManager {
     return { correct: isCorrect };
   }
 
-  finishStage(onStageFinish) {
+  // ★ 시간종료 시 결과 팝업을 트리거하는 핵심 메서드
+  finishStage() {
     this.user.clears += 1;
     this.updateUserData({ clears: this.user.clears });
     sound.playFanfare();
     triggerVictoryConfetti();
 
-    const isAllMissionsComplete = this.currentStageIndex >= MINI_GAMES.length - 1;
-
-    if (onStageFinish) {
-      onStageFinish({
+    // ★ 저장된 콜백을 호출하여 main.js의 showModal이 반드시 실행됩니다
+    if (this._onStageFinishCallback) {
+      this._onStageFinishCallback({
         stageNum: this.currentStageIndex + 1,
         stageName: this.currentMinigame.title,
         score: this.score,
-        earnedGold: this.earnedGoldInSession,
-        isAllMissionsComplete,
-        nextStageIndex: this.currentStageIndex + 1
+        earnedGold: this.earnedGoldInSession
       });
     }
   }
 
+  // =============================================
+  // 보스전
+  // =============================================
   startBossBattle(onTick, onFinish) {
     const BOSS_ENTRY_FEE = 100;
     if (this.user.gold < BOSS_ENTRY_FEE) {
@@ -163,6 +175,9 @@ export class GameManager {
     this.bossCorrectCount = 0;
     this.bossTimeLeft = 60;
 
+    // ★ 보스전 종료 콜백도 인스턴스에 저장
+    this._onBossFinishCallback = onFinish;
+
     this.nextBossQuestion();
 
     if (this.timer) clearInterval(this.timer);
@@ -172,7 +187,8 @@ export class GameManager {
 
       if (this.bossTimeLeft <= 0 || this.bossHp <= 0 || this.bossQuestionIndex > this.bossTotalQuestions) {
         clearInterval(this.timer);
-        this.finishBossBattle(onFinish);
+        this.timer = null;
+        this.finishBossBattle();
       }
     }, 1000);
   }
@@ -203,6 +219,8 @@ export class GameManager {
 
     if (this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
       clearInterval(this.timer);
+      this.timer = null;
+      // ★ 약간의 지연 후 finishBossBattle 호출 (저장된 콜백 사용)
       setTimeout(() => this.finishBossBattle(), 300);
     } else {
       this.nextBossQuestion();
@@ -210,7 +228,8 @@ export class GameManager {
     return { correct: isCorrect, bossHp: this.bossHp };
   }
 
-  finishBossBattle(onFinish) {
+  // ★ 보스전 종료 시 결과 팝업 트리거
+  finishBossBattle() {
     const isVictory = this.bossHp <= 0 || this.bossCorrectCount >= 7;
     let rewardGold = 0;
 
@@ -226,8 +245,9 @@ export class GameManager {
 
     this.updateUserData({ bossKills: this.user.bossKills });
 
-    if (onFinish) {
-      onFinish({
+    // ★ 저장된 콜백을 호출하여 main.js의 showModal이 반드시 실행됩니다
+    if (this._onBossFinishCallback) {
+      this._onBossFinishCallback({
         isVictory,
         correctCount: this.bossCorrectCount,
         rewardGold,

@@ -152,7 +152,7 @@ async function initApp() {
   if (btnStartSequential) {
     btnStartSequential.addEventListener('click', () => {
       sound.playClick();
-      startSequentialMissionFlow(0); // 미션 1부터 출발!
+      startSequentialMissionFlow(0);
     });
   }
 
@@ -165,7 +165,7 @@ async function initApp() {
     });
   });
 
-  // Render Mini-Game Selection Grid (Show Stage 1 ~ 6 Order)
+  // Render Mini-Game Selection Grid
   renderMinigameGrid();
 
   // Boss Card Listener
@@ -219,7 +219,7 @@ async function initApp() {
   });
 }
 
-// Render Mini-Game Grid Cards (Shows Stage Order 1 to 6)
+// Render Mini-Game Grid Cards
 function renderMinigameGrid() {
   const container = document.getElementById('minigame-grid-container');
   container.innerHTML = '';
@@ -237,7 +237,7 @@ function renderMinigameGrid() {
 
     card.addEventListener('click', () => {
       sound.playClick();
-      startSequentialMissionFlow(idx); // 선택한 해당 단계부터 순차 수행!
+      startSequentialMissionFlow(idx);
     });
 
     container.appendChild(card);
@@ -262,11 +262,13 @@ function startSequentialMissionFlow(stageIdx) {
       document.getElementById('game-timer').innerText = timeLeft;
     },
     (stageResult) => {
-      // 🌟 시간이 끝나면 미션 종료 팝업이 뜨고, 확인 버튼 클릭 시 게임 화면 종료(로비 이동)
+      // 🌟 25초 제한시간이 끝났을 때만 결과/종료 팝업창이 뜨며, 확인 버튼을 누르면 게임 플레이 화면이 종료되고 로비로 돌아갑니다.
       showModal(
-        `⏰ ${stageResult.stageName} 시간 종료!`,
-        `25초 제한시간이 끝났습니다!<br>획득 점수: <strong>${stageResult.score}점</strong><br>획득 골드: <strong>+${stageResult.earnedGold} G</strong><br><br>확인 버튼을 누르면 화면이 종료되어 로비로 돌아갑니다.`,
-        () => switchView('lobby') // 확인 버튼을 누르면 미니게임 화면 종료 및 로비 이동!
+        `⏰ ${stageResult.stageName} 결과`,
+        `25초 제한시간이 종료되었습니다!<br><br>획득 점수: <strong>${stageResult.score}점</strong><br>획득 골드: <strong>+${stageResult.earnedGold} G</strong><br><br>확인 버튼을 누르면 화면이 종료되고 메인 로비로 돌아갑니다.`,
+        () => {
+          switchView('lobby'); // 확인 버튼 클릭 시 플레이 화면 종료 ➔ 로비 복귀!
+        }
       );
     }
   );
@@ -291,6 +293,7 @@ function renderMinigameQuestion() {
     btn.innerHTML = optObj.displayHtml;
 
     btn.addEventListener('click', (e) => {
+      // 문제 풀 때는 팝업 없이 1회 클릭 즉시 다음 문제로 스무스 갱신!
       gameManager.checkAnswer(optObj, e.currentTarget);
       renderMinigameQuestion();
     });
