@@ -87,13 +87,18 @@ export class GameManager {
   }
 
   nextQuestion() {
+    if (!this.currentMinigame) return;
     this.currentQuestion = generateQuestion(this.currentMinigame.id);
   }
 
-  // 정답/오답 검증 (틀리면 재도전 없이 즉시 다음 문제로 전진!)
+  // 6가지 미니게임 전수 정답/오답 처리 (무조건 1회 클릭 시 무조건 다음 문제 생성!)
   checkAnswer(selectedAnsObj, eventTargetEl) {
-    const isCorrect = selectedAnsObj.improperText === this.currentQuestion.correctAnswer.improperText ||
-                      selectedAnsObj.mixedText === this.currentQuestion.correctAnswer.mixedText;
+    const currAns = this.currentQuestion.correctAnswer;
+    
+    // 정답 판단: 분자/분모 일치 OR 텍스트 일치
+    const isCorrect = (selectedAnsObj.num === currAns.num && selectedAnsObj.den === currAns.den) ||
+                      (String(selectedAnsObj.improperText).trim() === String(currAns.improperText).trim()) ||
+                      (String(selectedAnsObj.mixedText).trim() === String(currAns.mixedText).trim());
 
     const rect = eventTargetEl ? eventTargetEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
 
@@ -112,16 +117,15 @@ export class GameManager {
       sound.playCoin();
 
       showFloatingText(`+${earned} G! (${this.combo} 콤보!)`, rect.left, rect.top - 20, '#ffd700');
-      this.nextQuestion();
-      return { correct: true, combo: this.combo, earned };
     } else {
       sound.playWrong();
       this.combo = 0;
       showFloatingText(`❌ 땡!`, rect.left, rect.top - 20, '#ef4444');
-      
-      this.nextQuestion(); // 오답 시 기회 없이 즉시 다음 문제로 전환!
-      return { correct: false, correctAnswer: this.currentQuestion.correctAnswer };
     }
+
+    // 🌟 핵심: 맞추든 틀리든 절대로 재도전 기회 없이 무조건 다음 문제로 즉시 교체!
+    this.nextQuestion();
+    return { correct: isCorrect };
   }
 
   startBossBattle(onTick, onFinish) {
@@ -159,8 +163,10 @@ export class GameManager {
   }
 
   checkBossAnswer(selectedAnsObj, eventTargetEl) {
-    const isCorrect = selectedAnsObj.improperText === this.currentQuestion.correctAnswer.improperText ||
-                      selectedAnsObj.mixedText === this.currentQuestion.correctAnswer.mixedText;
+    const currAns = this.currentQuestion.correctAnswer;
+    const isCorrect = (selectedAnsObj.num === currAns.num && selectedAnsObj.den === currAns.den) ||
+                      (String(selectedAnsObj.improperText).trim() === String(currAns.improperText).trim()) ||
+                      (String(selectedAnsObj.mixedText).trim() === String(currAns.mixedText).trim());
 
     const rect = eventTargetEl ? eventTargetEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
 
@@ -169,28 +175,20 @@ export class GameManager {
       this.bossCorrectCount++;
       const damage = 10;
       this.bossHp = Math.max(0, this.bossHp - damage);
-
       showFloatingText(`💥 BOOM! -10 HP`, rect.left, rect.top - 30, '#ff4757');
-
-      if (this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
-        clearInterval(this.timer);
-        setTimeout(() => this.finishBossBattle(), 300);
-      } else {
-        this.nextBossQuestion();
-      }
-      return { correct: true, bossHp: this.bossHp };
     } else {
       sound.playWrong();
       showFloatingText(`🛡️ 오답! (방어 성공)`, rect.left, rect.top - 30, '#888888');
-
-      if (this.bossQuestionIndex >= this.bossTotalQuestions) {
-        clearInterval(this.timer);
-        setTimeout(() => this.finishBossBattle(), 300);
-      } else {
-        this.nextBossQuestion(); // 보스전 오답 시에도 바로 다음 문제로 넘어가기!
-      }
-      return { correct: false, bossHp: this.bossHp };
     }
+
+    // 보스전도 맞추든 틀리든 즉시 다음 문제 전진
+    if (this.bossHp <= 0 || this.bossQuestionIndex >= this.bossTotalQuestions) {
+      clearInterval(this.timer);
+      setTimeout(() => this.finishBossBattle(), 300);
+    } else {
+      this.nextBossQuestion();
+    }
+    return { correct: isCorrect, bossHp: this.bossHp };
   }
 
   finishBossBattle(onFinish) {
