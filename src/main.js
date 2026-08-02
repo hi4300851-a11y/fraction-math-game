@@ -278,7 +278,11 @@ function startSequentialMissionFlow(stageIdx) {
 
 // Render Question & Options for Minigame
 function renderMinigameQuestion() {
+  if (gameManager.isStageFinished || gameManager.timeLeft <= 0) return;
+
   const q = gameManager.currentQuestion;
+  if (!q) return;
+
   const renderBox = document.getElementById('question-render-box');
   renderBox.innerHTML = q.questionHtml;
 
@@ -293,9 +297,10 @@ function renderMinigameQuestion() {
     btn.innerHTML = optObj.displayHtml;
 
     btn.addEventListener('click', (e) => {
-      // 문제 풀 때는 팝업 없이 1회 클릭 즉시 다음 문제로 스무스 갱신!
-      gameManager.checkAnswer(optObj, e.currentTarget);
-      renderMinigameQuestion();
+      const res = gameManager.checkAnswer(optObj, e.currentTarget);
+      if (!res.finished) {
+        renderMinigameQuestion();
+      }
     });
 
     optionsGrid.appendChild(btn);
@@ -333,7 +338,11 @@ function renderVisualBars(visualData) {
 
 // Render Boss Question
 function renderBossQuestion() {
+  if (gameManager.isBossFinished || gameManager.bossTimeLeft <= 0) return;
+
   const q = gameManager.currentQuestion;
+  if (!q) return;
+
   document.getElementById('boss-progress-text').innerText = `문제 ${gameManager.bossQuestionIndex} / ${gameManager.bossTotalQuestions}`;
 
   const renderBox = document.getElementById('boss-question-render-box');
@@ -352,7 +361,7 @@ function renderBossQuestion() {
       document.getElementById('boss-hp-current').innerText = res.bossHp;
       document.getElementById('boss-hp-fill').style.width = `${res.bossHp}%`;
 
-      if (gameManager.bossHp > 0 && gameManager.bossQuestionIndex <= gameManager.bossTotalQuestions) {
+      if (!res.finished && gameManager.bossHp > 0 && gameManager.bossQuestionIndex <= gameManager.bossTotalQuestions) {
         renderBossQuestion();
       }
     });
