@@ -9,7 +9,7 @@ import {
 } from './firebase.js';
 import { sound } from './soundEngine.js';
 
-// 🏝️ 한 화면 S자 순서 배치 (3x3 Grid)
+// 🏝️ 빅토리아 아일랜드 섬 지형 배치 (3x3 Grid)
 export const MINI_GAMES = [
   { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-1', gridPos: { col: 1, row: 1 } },
   { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-2', gridPos: { col: 2, row: 1 } },
@@ -139,7 +139,7 @@ function showModal(title, bodyText, onClose) {
   if (closeBtn) closeBtn.addEventListener('click', handler);
 }
 
-// 🏝️ 한 화면에 스크롤 없이 들어오는 컴팩트 아일랜드 맵 렌더링 🏝️
+// 🏝️ 유기적 불규칙 섬 형태 렌더링 (Organic Island Polygon Shapes) 🏝️
 function renderCompactIslandGrid() {
   const container = document.getElementById('compact-island-grid-box');
   if (!container) return;
@@ -159,7 +159,7 @@ function renderCompactIslandGrid() {
     const cell = container.querySelector(`.sector-cell[data-col="${game.gridPos.col}"][data-row="${game.gridPos.row}"]`);
     if (cell) {
       const node = document.createElement('div');
-      node.className = `compact-node ${game.themeClass}`;
+      node.className = `organic-island-node ${game.themeClass}`;
       node.innerHTML = `
         <div class="node-order-badge">STAGE ${game.stageNum}</div>
         <div class="node-icon-emoji">${game.icon}</div>
@@ -177,7 +177,7 @@ function renderCompactIslandGrid() {
   const centerCell = container.querySelector(`.sector-cell[data-col="2"][data-row="2"]`);
   if (centerCell) {
     const bossNode = document.createElement('div');
-    bossNode.className = 'compact-node theme-boss';
+    bossNode.className = 'organic-island-node theme-boss';
     bossNode.innerHTML = `
       <div class="node-order-badge" style="background:#450a0a; color:#fca5a5;">BOSS</div>
       <div class="node-icon-emoji">🐲</div>
@@ -280,7 +280,7 @@ async function initApp() {
     });
   });
 
-  // 한 화면 컴팩트 아일랜드 맵 렌더링
+  // 유기적 섬 지형 맵 렌더링
   renderCompactIslandGrid();
 
   // Boss Card Listener

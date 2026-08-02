@@ -109,30 +109,30 @@
     .banner-icon { font-size: 2.2rem; }
 
     /* ========================================================= */
-    /* 🏝️ 한눈에 들어오는 컴팩트 메이플 빅토리아 아일랜드 월드 맵 🏝️ */
+    /* 🏝️ 유기적인 리얼 섬 형태 빅토리아 아일랜드 월드 맵 🏝️ */
     /* ========================================================= */
     .victoria-map-frame {
       width: 100%;
-      height: 440px;
-      background: #7dd3fc;
+      height: 450px;
+      background: #38bdf8;
       background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
-        radial-gradient(circle at 50% 50%, #bae6fd 0%, #38bdf8 60%, #0284c7 100%);
-      background-size: 32px 32px, 32px 32px, 100% 100%;
-      border: 5px solid #d97706;
-      border-radius: 24px;
+        radial-gradient(circle at 50% 50%, #7dd3fc 0%, #0284c7 80%, #0369a1 100%),
+        linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+      border: 6px solid #b45309;
+      border-radius: 28px;
       padding: 0.8rem 1rem;
       position: relative;
-      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3), 0 15px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4), 0 15px 35px rgba(0, 0, 0, 0.6);
       overflow: hidden;
     }
 
     /* 뭉게 구름 효과 */
     .map-cloud {
       position: absolute;
-      font-size: 3.5rem;
-      opacity: 0.8;
+      font-size: 3.8rem;
+      opacity: 0.85;
       pointer-events: none;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
       animation: cloudFloat 10s infinite alternate ease-in-out;
@@ -153,15 +153,15 @@
       top: 10px;
       right: 15px;
       background: #fef3c7;
-      border: 3px solid #78350f;
-      border-radius: 12px;
-      padding: 0.4rem 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 3.5px solid #78350f;
+      border-radius: 14px;
+      padding: 0.4rem 1.1rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
       z-index: 10;
       text-align: center;
     }
     .scroll-banner-title h3 {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       color: #78350f;
       text-shadow: 1px 1px 0px #fef08a;
     }
@@ -170,7 +170,7 @@
       color: #92400e;
     }
 
-    /* 한 화면 3x3 S자 순서 연결 레이아웃 그리드 */
+    /* 3x3 섬 지도 배치 그리드 */
     .compact-island-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -190,75 +190,93 @@
       position: relative;
     }
 
-    /* 한눈에 들어오는 컴팩트 아일랜드 노드 */
-    .compact-node {
-      width: 95%;
-      height: 95%;
-      max-height: 110px;
-      background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #ca8a04 100%);
-      border: 3px solid #713f12;
-      border-radius: 20px;
-      padding: 0.4rem;
+    /* 🏝️ 유기적인 불규칙 섬 형태 노드 (Organic Island Polygon Shapes) 🏝️ */
+    .organic-island-node {
+      width: 96%;
+      height: 96%;
+      max-height: 115px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), inset 0 -4px 0 rgba(161, 98, 7, 0.4);
-      transition: all 0.2s ease;
       position: relative;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.45));
     }
-    .compact-node:hover {
-      transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4), 0 0 18px rgba(253, 224, 71, 0.9);
-      border-color: #ffffff;
+    .organic-island-node:hover {
+      transform: translateY(-8px) scale(1.08);
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 20px rgba(253, 224, 71, 0.9));
     }
 
-    .compact-node.theme-1 { background: linear-gradient(135deg, #bbf7d0 0%, #4ade80 50%, #16a34a 100%); border-color: #14532d; }
-    .compact-node.theme-2 { background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%); border-color: #0c4a6e; }
-    .compact-node.theme-3 { background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #ca8a04 100%); border-color: #713f12; }
-    .compact-node.theme-4 { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #475569 100%); border-color: #0f172a; }
-    .compact-node.theme-5 { background: linear-gradient(135deg, #fed7aa 0%, #fb923c 50%, #ea580c 100%); border-color: #7c2d12; }
-    .compact-node.theme-6 { background: linear-gradient(135deg, #e0e7ff 0%, #818cf8 50%, #4f46e5 100%); border-color: #1e1b4b; }
-
-    /* 중앙 최종 보스전 노드 */
-    .compact-node.theme-boss {
-      background: linear-gradient(135deg, #fca5a5 0%, #ef4444 50%, #991b1b 100%);
-      border: 4px solid #450a0a;
-      box-shadow: 0 0 25px rgba(239, 68, 68, 0.8), inset 0 -4px 0 rgba(127, 29, 29, 0.6);
-      animation: pulseBossCompact 2s infinite ease-in-out;
+    /* 각 미션별 유기적 해안선 섬 지형 모양 (Organic Blobs & Polygons) */
+    .organic-island-node.theme-1 {
+      background: linear-gradient(135deg, #86efac 0%, #4ade80 50%, #15803d 100%);
+      border-radius: 42% 58% 70% 30% / 45% 40% 60% 55%;
+      border: 4px solid #14532d;
+      box-shadow: inset 0 -8px 0 rgba(20, 83, 45, 0.6);
     }
-    @keyframes pulseBossCompact {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.04); }
+    .organic-island-node.theme-2 {
+      background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0369a1 100%);
+      border-radius: 65% 35% 45% 55% / 30% 60% 40% 70%;
+      border: 4px solid #0c4a6e;
+      box-shadow: inset 0 -8px 0 rgba(12, 74, 110, 0.6);
+    }
+    .organic-island-node.theme-3 {
+      background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #a16207 100%);
+      border-radius: 35% 65% 55% 45% / 60% 35% 65% 40%;
+      border: 4px solid #713f12;
+      box-shadow: inset 0 -8px 0 rgba(113, 63, 18, 0.6);
+    }
+    .organic-island-node.theme-4 {
+      background: linear-gradient(135deg, #cbd5e1 0%, #64748b 50%, #334155 100%);
+      border-radius: 50% 50% 35% 65% / 45% 65% 35% 55%;
+      border: 4px solid #0f172a;
+      box-shadow: inset 0 -8px 0 rgba(15, 23, 42, 0.6);
+    }
+    .organic-island-node.theme-5 {
+      background: linear-gradient(135deg, #ffedd5 0%, #fb923c 50%, #c2410c 100%);
+      border-radius: 60% 40% 65% 35% / 40% 55% 45% 60%;
+      border: 4px solid #7c2d12;
+      box-shadow: inset 0 -8px 0 rgba(124, 45, 18, 0.6);
+    }
+    .organic-island-node.theme-6 {
+      background: linear-gradient(135deg, #ddd6fe 0%, #8b5cf6 50%, #5b21b6 100%);
+      border-radius: 40% 60% 30% 70% / 65% 35% 65% 35%;
+      border: 4px solid #1e1b4b;
+      box-shadow: inset 0 -8px 0 rgba(30, 27, 75, 0.6);
+    }
+
+    /* 중앙 최종 보스 어둠의 둥지 섬 (Dark Volcano Island) */
+    .organic-island-node.theme-boss {
+      background: linear-gradient(135deg, #fca5a5 0%, #dc2626 50%, #7f1d1d 100%);
+      border-radius: 55% 45% 60% 40% / 45% 55% 40% 60%;
+      border: 5px solid #450a0a;
+      box-shadow: inset 0 -8px 0 rgba(69, 10, 10, 0.8), 0 0 30px rgba(239, 68, 68, 0.9);
+      animation: pulseBossIsland 2s infinite ease-in-out;
+    }
+    @keyframes pulseBossIsland {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8)); }
+      50% { transform: scale(1.06); filter: drop-shadow(0 0 30px rgba(239, 68, 68, 1)); }
     }
 
     .node-order-badge {
       position: absolute;
-      top: -10px;
+      top: -12px;
       background: #78350f;
       color: #fef08a;
-      border: 1.5px solid #ffffff;
-      padding: 0.1rem 0.5rem;
-      border-radius: 12px;
+      border: 2px solid #ffffff;
+      padding: 0.15rem 0.6rem;
+      border-radius: 14px;
       font-size: 0.75rem;
       font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
 
-    .node-icon-emoji { font-size: 2.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-    .node-title-text { font-size: 1.05rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); line-height: 1.1; margin-top: 0.1rem; }
-    .node-sub-text { font-size: 0.75rem; color: #fef08a; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
-
-    /* 경로 화살표 안내 뱃지 */
-    .flow-arrow {
-      position: absolute;
-      font-size: 1.2rem;
-      color: #fbbf24;
-      text-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
-      pointer-events: none;
-      z-index: 8;
-    }
+    .node-icon-emoji { font-size: 2.3rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
+    .node-title-text { font-size: 1.1rem; color: #ffffff; text-shadow: 1px 2px 4px rgba(0,0,0,0.9); line-height: 1.1; margin-top: 0.1rem; font-weight: bold; }
+    .node-sub-text { font-size: 0.78rem; color: #fef08a; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
 
     .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0.8rem; }
     .btn-back { font-family: 'Jua', sans-serif; background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 0.4rem 0.8rem; border-radius: 12px; cursor: pointer; }
@@ -345,7 +363,7 @@
       </div>
     </header>
 
-    <!-- VIEW 1: 메인 로비 화면 (스크롤 없는 아일랜드 월드 맵) -->
+    <!-- VIEW 1: 메인 로비 화면 (자연스러운 유기적 아일랜드 월드 맵) -->
     <main id="view-lobby" class="view-screen active">
       <div class="game-title">
         <h1>⚔️ 진천상산초 4학년 1반 분수 용사들의 보스 퇴치 대작전!! 🛡️</h1>
@@ -374,7 +392,7 @@
         </div>
       </div>
 
-      <!-- 🏝️ 한눈에 들어오는 컴팩트 아일랜드 월드 맵 (스크롤 NO) 🏝️ -->
+      <!-- 🏝️ 실제 게임 맵 스타일 유기적 섬 지형 월드 맵 (Organic Island Shapes) 🏝️ -->
       <div class="victoria-map-frame">
         <div class="map-cloud cloud-1">☁️</div>
         <div class="map-cloud cloud-2">☁️</div>
@@ -386,7 +404,7 @@
         </div>
 
         <div class="compact-island-grid" id="compact-island-grid-box">
-          <!-- 스크립트로 한 화면 3x3 S자 순서 맵이 배치됩니다 -->
+          <!-- 스크립트로 자연스러운 유기적 섬 지형 맵이 배치됩니다 -->
         </div>
       </div>
     </main>
@@ -532,10 +550,7 @@
       }
     }
 
-    // 🏝️ 한 화면 S자 순서 배치 (3x3 Grid)
-    // Row 1: STAGE 1 (col 1, row 1) ➡️ STAGE 2 (col 2, row 1) ➡️ STAGE 3 (col 3, row 1)
-    // Row 2: STAGE 6 (col 1, row 2) ⬅️ FINAL BOSS (col 2, row 2) ⬆️ STAGE 4 (col 3, row 2)
-    // Row 3: STAGE 5 (col 2, row 3) ⬅️ STAGE 4 지점 연결
+    // 🏝️ 빅토리아 아일랜드 섬 지형 배치 (3x3 Grid)
     const MINI_GAMES = [
       { id: 'proper_add', stageNum: 1, title: '버섯 마을 🍄', sub: '진분수의 덧셈', icon: '🍄', themeClass: 'theme-1', gridPos: { col: 1, row: 1 } },
       { id: 'improper_add', stageNum: 2, title: '요정의 숲 🌲', sub: '가분수의 덧셈', icon: '🌲', themeClass: 'theme-2', gridPos: { col: 2, row: 1 } },
@@ -831,7 +846,7 @@
       btnNext.onclick = handleNext;
     }
 
-    // 🏝️ 한 화면에 스크롤 없이 들어오는 컴팩트 아일랜드 맵 렌더링 🏝️
+    // 🏝️ 유기적 불규칙 섬 형태 렌더링 (Organic Island Polygon Shapes) 🏝️
     function renderCompactIslandGrid() {
       const container = document.getElementById('compact-island-grid-box');
       if (!container) return;
@@ -847,12 +862,12 @@
         }
       }
 
-      // 6개 스테이지 노드 배치
+      // 6개 오가닉 섬 지형 노드 배치
       MINI_GAMES.forEach((game, idx) => {
         const cell = container.querySelector(`.sector-cell[data-col="${game.gridPos.col}"][data-row="${game.gridPos.row}"]`);
         if (cell) {
           const node = document.createElement('div');
-          node.className = `compact-node ${game.themeClass}`;
+          node.className = `organic-island-node ${game.themeClass}`;
           node.innerHTML = `
             <div class="node-order-badge">STAGE ${game.stageNum}</div>
             <div class="node-icon-emoji">${game.icon}</div>
@@ -866,11 +881,11 @@
         }
       });
 
-      // 중앙 셀 (2,2)에 보스 드래곤 둥지 노드 배치
+      // 중앙 셀 (2,2)에 보스 드래곤 둥지 화산섬 배치
       const centerCell = container.querySelector(`.sector-cell[data-col="2"][data-row="2"]`);
       if (centerCell) {
         const bossNode = document.createElement('div');
-        bossNode.className = 'compact-node theme-boss';
+        bossNode.className = 'organic-island-node theme-boss';
         bossNode.innerHTML = `
           <div class="node-order-badge" style="background:#450a0a; color:#fca5a5;">BOSS</div>
           <div class="node-icon-emoji">🐲</div>
@@ -898,7 +913,7 @@
         btnGuest.addEventListener('click', doGuestAuth);
       }
 
-      // 한 화면 컴팩트 아일랜드 맵 렌더링
+      // 유기적 섬 지형 맵 렌더링
       renderCompactIslandGrid();
 
       document.getElementById('btn-start-sequential-mission').addEventListener('click', () => {
